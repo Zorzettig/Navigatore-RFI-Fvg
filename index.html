@@ -309,6 +309,13 @@
         const nomeSuper8 = "UDINE - CERVIGNANO A.G.";
         const nomeSuper9 = "VENEZIA MESTRE - VENEZIA S.LUCIA";
 
+        // LISTA BIANCA: SOLO LE TRATTE AMMESSE
+        const TRATTE_AMMESSE = [
+            nomeSuper1, nomeSuper2, nomeSuper3, nomeSuper4, 
+            nomeSuper5, nomeSuper6, nomeSuper7, nomeSuper8, 
+            nomeSuper9, "P.M. VAT - UDINE PARCO"
+        ];
+
         // TAVOLOZZA COLORI FISSI E DISTINTI
         const COLORI_FISSI = {
             [nomeSuper2]: "#E3000F", // Rosso acceso (UDINE - VENEZIA MESTRE)
@@ -337,79 +344,15 @@
             { nuovoNome: nomeSuper9, segmenti: ["VENEZIA MESTRE - DEV.ESTR.VENEZIA (ponte nuovo)", "DEV.ESTR.VENEZIA - VENEZIA S.LUCIA (ponte vecchio)"] }
         ];
 
-        const LINEE_ESCLUSE = ["ALA - PERI", "MOZZECANE - ROVERBELLA", "OCCHIOBELLO - FERRARA", "ADRIA - LOREO", "ALANO - CORNUDA", "ALTAVILLA - VICENZA", "BADIA POLESINE - LENDINARA", "BASSANO DEL GRAPPA - CASTELLO DI GODEGO", "BELLUNO - SEDICO", "BEVILACQUA - MONTAGNANA", "BIVIO P.C. S.LUCIA - BUTTAPIETRA", "BIVIO P.C. S.LUCIA - DOSSOBUONO", "BIVIO P.C. S.MASSIMO - VERONA PORTA NUOVA", "BIVIO P.C.FENILONE - VERONA PORTA NUOVA", "BIVIO RONCHI - ALTAVILLA", "BOVOLONE - CEREA", "BUSCHE - FELTRE", "BUTTAPIETRA - ISOLA DELLA SCALA", "CALALZO - PERAROLO DI CADORE", "CAMPOSAMPIERO - CITTADELLA", "CAMPOSAMPIERO - VIGODARZERE", "CARPANE' - BASSANO DEL GRAPPA", "CASTAGNARO - BADIA POLESINE", "CASTELFRANCO - CAMPOSAMPIERO", "CASTELFRANCO - ISTRANA", "CASTELFRANCO - PIOMBINO", "CASTELLO DI GODEGO - CASTELFRANCO", "CAVANELLA - CHIOGGIA", "CAVAZZALE - DUEVILLE", "CEREA - LEGNAGO", "CISMON DEL GRAPPA - CARPANE'", "CITTADELLA - BASSANO DEL GRAPPA", "CITTADELLA - CASTELFRANCO", "CORNUDA - MONTEBELLUNA", "COSTA DI ROVIGO - ROVIGO", "DEV. ESTREMO VR - VERONA PORTA VESCOVO", "DEV.ESTR. VICENZA - CAVAZZALE", "DEV.ESTR. VICENZA - S.PIETRO IN GU'", "DIRAMAZIONE VR SC-VR PN - VERONA PORTA NUOVA", "DOLO - MIRA-MIRANO (storica)", "DOMEGLIARA - BIVIO P.C. S.MASSIMO", "DOSSOBUONO - VILLAFRANCA", "DUEVILLE - THIENE", "ESTE - MONSELICE", "FANZOLO - CASTELFRANCO", "FELTRE - QUERO-VAS", "FRATTA - COSTA DI ROVIGO", "GRISIGNANO DI ZOCCO - GS MONTA'", "GS ALTICHIERO - PADOVA", "GS MONTA' - PADOVA", "ISOLA DELLA SCALA - BOVOLONE", "ISOLA DELLA SCALA - NOGARA", "ISTRANA - TREVISO SCALO P.S.Q.", "LAMA - ADRIA", "LEGNAGO - BEVILACQUA", "LEGNAGO - VILLABARTOLOMEA", "LENDINARA - FRATTA", "LONGARONE - PONTE NELLE ALPI", "LOREO - CAVANELLA", "MAERNE DI MARTELLAGO - BIVIO P.C. SPINEA", "MIRA-MIRANO - G.S. MESTRE (storica)", "MONSELICE - S.ELENA", "MONTAGNANA - SALETTO", "MONTEBELLUNA - FANZOLO", "MONTEBELLUNA - POSTIOMA", "MOTTA DI LIVENZA - PRAMAGGIORE", "NOALE - MAERNE DI MARTELLAGO", "NOGARA - P.C. OSTIGLIA NORD", "NOGARA - SANGUINETTO", "ODERZO - MOTTA DI LIVENZA", "OSPEDALETTO - ESTE", "OSPITALE DI CADORE - LONGARONE", "P.C. DOLCE' - DOMEGLIARA", "P.C. MONTEBELLO - BIVIO RONCHI", "PADOVA - PADOVA C.M.", "PADOVA - PADOVA FASCIO SECONDARIO", "PADOVA - PADOVA FASCIO SECONDARIO (storica)", "PADOVA C.M. - TERME EUGANEE", "PADOVA FASCIO SECONDARIO - DOLO (storica)", "PADOVA FASCIO SECONDARIO - G.S. MESTRE AC (AV/AC)", "PERAROLO DI CADORE - OSPITALE DI CADORE", "PERI - P.C. DOLCE'", "PESCHIERA DEL GARDA - SOMMACAMPAGNA", "PIOMBINO - NOALE", "POLESELLA - OCCHIOBELLO", "PONTE DI PIAVE - ODERZO", "PONTE NELLE ALPI - BELLUNO", "PONTE NELLE ALPI - S.CROCE DEL LAGO", "POSTIOMA - TREVISO CENTRALE (CALALZO)", "PRAMAGGIORE - PORTOGRUARO", "PRIMOLANO - CISMON DEL GRAPPA", "QUERO-VAS - ALANO", "ROVIGO - LAMA", "ROVIGO - POLESELLA", "S.BIAGIO DI CALLALTA - PONTE DI PIAVE", "S.BONIFACIO - P.C. MONTEBELLO", "S.CROCE DEL LAGO - VITTORIO VENETO", "S.ELENA - ROVIGO", "S.GIUSTINA - BUSCHE", "S.PIETRO IN GU' - CITTADELLA", "SALETTO - OSPEDALETTO", "SANGUINETTO - CEREA", "SEDICO - S.GIUSTINA", "TERME EUGANEE - MONSELICE", "THIENE - SCHIO", "TREVISO CENTRALE - S.BIAGIO DI CALLALTA", "TREVISO SCALO P.S.Q. - TREVISO CENTRALE", "VERONA PORTA NUOVA - BIVIO P.C. S.LUCIA", "VERONA PORTA NUOVA - DEV. ESTREMO VR", "VERONA PORTA NUOVA SCALO - DEV. ESTREMO VR", "VERONA PORTA VESCOVO - P.C. CALDIERO", "VICENZA - DEV.ESTR. VICENZA", "VICENZA - GRISIGNANO DI ZOCCO", "VIGODARZERE - GS ALTICHIERO", "VILLABARTOLOMEA - CASTAGNARO", "VILLAFRANCA - MOZZECANE", "VITTORIO VENETO - D.E. CONEGLIANO", "VENEZIA MESTRE - VENEZIA MARGHERA SCALO", "BIVIO P.C. FENILONE - BIVIO P.C. S.MASSIMO", "BIVIO P.C. FENILONE - DIRAMAZIONE VR SC-VR PN", "BIVIO P.C. S.LUCIA - BIVIO P.C. FENILONE", "BIVIO P.C. S.LUCIA - BIVIO P.C. S.MASSIMO", "BIVIO P.C. S.LUCIA - DIRAMAZIONE VR SC-VR PN", "BIVIO P.C. S.MASSIMO - DIRAMAZIONE VR SC-VR PN", "BIVIO P.C. S.MASSIMO - VERONA QUADRANTE EUROPA", "BIVIO P.C.FENILONE - VERONA QUADRANTE EUROPA", "BIVIO RIVANA - GAIBANELLA", "CASTEL D'ARIO - NOGARA", "DESENZANO - PESCHIERA DEL GARDA", "DEV.EST.PADOVA - PADOVA INTERPORTO", "GONZAGA - ROLO", "GRIGNO - PRIMOLANO", "POGGIO RUSCO - S.FELICE SUL PANARO", "SOMMACAMPAGNA - BIVIO P.C.FENILONE", "GEMONA DEL FRIULI - OSOPPO", "MEDUNO - MANIAGO", "MAJANO - PINZANO", "OSOPPO - MAJANO", "PADOVA C.M. - GS MONTA'", "PADOVA FASCIO SECONDARIO - DEV.EST.PADOVA", "PINZANO - TRAVESIO", "TRAVESIO - MEDUNO", "AURISINA - VILLA OPICINA", "BIVIO D'AURISINA - BIVIO D'AURISINA SC. ESTR. VIADOTTO", "CONFINE DI STATO (SLO) - GORIZIA C.LE", "DEV.ESTREMO LATO CERVIGNANO A.G. - CERVIGNANO A.G.", "RONCHI DEI LEGIONARI SUD - RONCHI DEI LEGIONARI NORD", "TRIESTE CAMPO MARZIO - VILLA OPICINA", "VRTOJBA - CONFINE DI STATO (SLO)", "VRTOJBA DEV.MARK - VRTOJBA", "NOVA GORICA - VRTOJBA DEV.MARK", "UDINE PARCO DEV. LAIPACCO - UDINE PARCO DEV. PRADAMANO", "UDINE PARCO DEV. LAIPACCO - BIVIO CARGNACCO", "BIVIO CARGNACCO - DEV. BIVIO CARGNACCO (VC)", "P.M. VAT - UDINE PARCO DEV. LAIPACCO", "TORVISCOSA - DEV.ESTREMO LATO TORVISCOSA", "DEV.ESTREMO LATO TORVISCOSA - CERVIGNANO SMISTAMENTO", "CERVIGNANO SMISTAMENTO - DEV.ESTREMO LATO CERVIGNANO A.G.", "DEV.RACCORDO PARTENZE - CERVIGNANO SMISTAMENTO", "CERVIGNANO SMISTAMENTO F.P. - DEV.RACCORDO ARRIVI", "DEV.E. LATO UDINE - CERVIGNANO SMISTAMENTO F.P.", "DEV.ESTREMO LATO CERVIGNANO A.G. - DEV.RACCORDO PARTENZE", "DEV.ESTREMO LATO TORVISCOSA - DEV.ESTREMO LATO CERVIGNANO A.G.", "DEV.RACCORDO ARRIVI - DEV.RACCORDO PARTENZE", "TRIESTE C.LE GR SC. BARCOLA - TRIESTE C.LE GR SC. ROIANO", "TRIESTE C.LE GR SC. GRETTA - TRIESTE C.LE GR SC. ROIANO", "TRIESTE C.LE GR SC. ROIANO - TRIESTE CAMPO MARZIO", "BIVIO D'AURISINA SC. ESTR. VIADOTTO - AURISINA", "BIVIO D'AURISINASC. ESTR. GALLERIA - BIVIO D'AURISINA SC. ESTR. VIADOTTO", "G.S. MESTRE - VENEZIA MESTRE (AV/AC)", "G.S. MESTRE - VENEZIA MESTRE (storica)", "CONFLUENZA UD-TS - G.S. MESTRE", "DEV.ESTR.VENEZIA - VENEZIA MARITTIMA", "DEV.ESTR.VENEZIA - VENEZIA S.LUCIA (ponte nuovo)", "G.S. MESTRE - LIMITE FS (LINEA ADRIA)", "P.C. CALDIERO - S.BONIFACIO", "P.C. CALDIERO - S. BONIFACIO", "P.C.CALDIERO - S.BONIFACIO", "VENEZIA MESTRE - DEV.ESTR.VENEZIA (ponte vecchio)", "VENEZIA MESTRE - G.S. MESTRE (LINEA ADRIA)", "BIVIO MAROCCO - VENEZIA MESTRE"];
-        
         // CALIBRAZIONI LINEE
         const kmRealiSanPoloMestre = { "VENEZIA MESTRE": 0.0, "OLIMPIA": 1.9, "CARPENEDO": 3.9, "GAGGIO": 10.7, "QUARTO D'ALTINO": 15.7, "MEOLO": 23.9, "FOSSALTA DI PIAVE": 27.7, "S.DONA": 32.7, "CEGGIA": 40.6, "S.STINO": 45.9, "LISON": 52.8, "PORTOGRUARO": 59.3, "LATISANA": 73.2, "S.GIORGIO": 90.6, "TORVISCOSA": 96.6, "CERVIGNANO": 101.3, "TRIESTE AIRPORT": 112.8, "RONCHI": 114.0 };
         const capisaldiGpsUdineBivioSPolo = [ { km: 2.9, lat: 46.043658, lon: 13.272406 }, { km: 30, lat: 45.938751, lon: 13.572469 }, { km: 47.6, lat: 45.858269, lon: 13.484634 }, { km: 48.95, lat: 45.847216, lon: 13.489232 }, { km: 51.1, lat: 45.831259, lon: 13.504973 }, { km: 52.2, lat: 45.822599, lon: 13.513489 } ];
-        
         const kmRealiUdineMestre = { "UDINE": 126.57, "BASILIANO": 115.2, "CODROIPO": 103.6, "CASARSA": 92.9, "CUSANO": 86.4, "PORDENONE": 77.8, "FONTANAFREDDA": 71.3, "SACILE": 64.9, "ORSAGO": 59.4, "PIANZANO": 55.4, "CONEGLIANO": 47.8, "SUSEGANA": 40.0, "SPRESIANO": 34.7, "LANCENIGO": 27.2, "TREVISO CENTRALE": 20.9, "SAN TROVASO": 16.3, "PREGANZIOL": 13.9, "MOGLIANO VENETO": 9.2, "OSPEDALE": 3.9, "GAZZERA": 1.2, "VENEZIA MESTRE": 0.0 };
-        const capisaldiGpsUdineMestre = [
-            { km: 1, lat: 45.488092, lon: 12.222952 },
-            { km: 4, lat: 45.514736, lon: 12.226043 },
-            { km: 5, lat: 45.523635, lon: 12.227747 },
-            { km: 6, lat: 45.532502, lon: 12.229466 },
-            { km: 8, lat: 45.550450, lon: 12.232614 },
-            { km: 9, lat: 45.559444, lon: 12.232772 },
-            { km: 10, lat: 45.568426, lon: 12.232380 },
-            { km: 14, lat: 45.604362, lon: 12.231518 },
-            { km: 16, lat: 45.622234, lon: 12.232779 },
-            { km: 17, lat: 45.631263, lon: 12.232588 },
-            { km: 19, lat: 45.649205, lon: 12.232154 },
-            { km: 20, lat: 45.657771, lon: 12.234304 },
-            { km: 21, lat: 45.659592, lon: 12.246388 },
-            { km: 23, lat: 45.672559, lon: 12.259240 },
-            { km: 25, lat: 45.690633, lon: 12.262503 },
-            { km: 27, lat: 45.708186, lon: 12.265405 },
-            { km: 29, lat: 45.726534, lon: 12.267608 },
-            { km: 33, lat: 45.762196, lon: 12.267827 },
-            { km: 35, lat: 45.779674, lon: 12.265230 },
-            { km: 37, lat: 45.795752, lon: 12.254676 },
-            { km: 38, lat: 45.804635, lon: 12.251723 },
-            { km: 39, lat: 45.813155, lon: 12.251198 },
-            { km: 40, lat: 45.820622, lon: 12.258001 },
-            { km: 41, lat: 45.828916, lon: 12.263692 },
-            { km: 43, lat: 45.845420, lon: 12.273212 },
-            { km: 45, lat: 45.862304, lon: 12.283018 },
-            { km: 47, lat: 45.879249, lon: 12.291827 },
-            { km: 48, lat: 45.885287, lon: 12.300507 },
-            { km: 49, lat: 45.889654, lon: 12.311860 },
-            { km: 50, lat: 45.894103, lon: 12.323346 },
-            { km: 53, lat: 45.904810, lon: 12.358450 },
-            { km: 55, lat: 45.911704, lon: 12.382343 },
-            { km: 57, lat: 45.918573, lon: 12.406137 },
-            { km: 60, lat: 45.930688, lon: 12.440696 },
-            { km: 65, lat: 45.948531, lon: 12.498970 },
-            { km: 72, lat: 45.968678, lon: 12.583043 },
-            { km: 73, lat: 45.968050, lon: 12.595957 },
-            { km: 74, lat: 45.967404, lon: 12.608984 },
-            { km: 75, lat: 45.965754, lon: 12.622196 },
-            { km: 77, lat: 45.960610, lon: 12.646295 },
-            { km: 78, lat: 45.954923, lon: 12.655463 },
-            { km: 80, lat: 45.947060, lon: 12.676631 },
-            { km: 83, lat: 45.941725, lon: 12.713792 },
-            { km: 84, lat: 45.942813, lon: 12.726719 },
-            { km: 86, lat: 45.944980, lon: 12.752178 },
-            { km: 88, lat: 45.947163, lon: 12.777969 },
-            { km: 93, lat: 45.953200, lon: 12.841473 },
-            { km: 94, lat: 45.955964, lon: 12.854021 },
-            { km: 95, lat: 45.958618, lon: 12.865924 },
-            { km: 96, lat: 45.959513, lon: 12.879297 },
-            { km: 104, lat: 45.967025, lon: 12.980304 },
-            { km: 105, lat: 45.971165, lon: 12.991998 },
-            { km: 115, lat: 46.011938, lon: 13.107003 },
-            { km: 126, lat: 46.053864, lon: 13.235291 }
-        ];
-        
+        const capisaldiGpsUdineMestre = [ { km: 1, lat: 45.488092, lon: 12.222952 }, { km: 4, lat: 45.514736, lon: 12.226043 }, { km: 5, lat: 45.523635, lon: 12.227747 }, { km: 6, lat: 45.532502, lon: 12.229466 }, { km: 8, lat: 45.550450, lon: 12.232614 }, { km: 9, lat: 45.559444, lon: 12.232772 }, { km: 10, lat: 45.568426, lon: 12.232380 }, { km: 14, lat: 45.604362, lon: 12.231518 }, { km: 16, lat: 45.622234, lon: 12.232779 }, { km: 17, lat: 45.631263, lon: 12.232588 }, { km: 19, lat: 45.649205, lon: 12.232154 }, { km: 20, lat: 45.657771, lon: 12.234304 }, { km: 21, lat: 45.659592, lon: 12.246388 }, { km: 23, lat: 45.672559, lon: 12.259240 }, { km: 25, lat: 45.690633, lon: 12.262503 }, { km: 27, lat: 45.708186, lon: 12.265405 }, { km: 29, lat: 45.726534, lon: 12.267608 }, { km: 33, lat: 45.762196, lon: 12.267827 }, { km: 35, lat: 45.779674, lon: 12.265230 }, { km: 37, lat: 45.795752, lon: 12.254676 }, { km: 38, lat: 45.804635, lon: 12.251723 }, { km: 39, lat: 45.813155, lon: 12.251198 }, { km: 40, lat: 45.820622, lon: 12.258001 }, { km: 41, lat: 45.828916, lon: 12.263692 }, { km: 43, lat: 45.845420, lon: 12.273212 }, { km: 45, lat: 45.862304, lon: 12.283018 }, { km: 47, lat: 45.879249, lon: 12.291827 }, { km: 48, lat: 45.885287, lon: 12.300507 }, { km: 49, lat: 45.889654, lon: 12.311860 }, { km: 50, lat: 45.894103, lon: 12.323346 }, { km: 53, lat: 45.904810, lon: 12.358450 }, { km: 55, lat: 45.911704, lon: 12.382343 }, { km: 57, lat: 45.918573, lon: 12.406137 }, { km: 60, lat: 45.930688, lon: 12.440696 }, { km: 65, lat: 45.948531, lon: 12.498970 }, { km: 72, lat: 45.968678, lon: 12.583043 }, { km: 73, lat: 45.968050, lon: 12.595957 }, { km: 74, lat: 45.967404, lon: 12.608984 }, { km: 75, lat: 45.965754, lon: 12.622196 }, { km: 77, lat: 45.960610, lon: 12.646295 }, { km: 78, lat: 45.954923, lon: 12.655463 }, { km: 80, lat: 45.947060, lon: 12.676631 }, { km: 83, lat: 45.941725, lon: 12.713792 }, { km: 84, lat: 45.942813, lon: 12.726719 }, { km: 86, lat: 45.944980, lon: 12.752178 }, { km: 88, lat: 45.947163, lon: 12.777969 }, { km: 93, lat: 45.953200, lon: 12.841473 }, { km: 94, lat: 45.955964, lon: 12.854021 }, { km: 95, lat: 45.958618, lon: 12.865924 }, { km: 96, lat: 45.959513, lon: 12.879297 }, { km: 104, lat: 45.967025, lon: 12.980304 }, { km: 105, lat: 45.971165, lon: 12.991998 }, { km: 115, lat: 46.011938, lon: 13.107003 }, { km: 126, lat: 46.053864, lon: 13.235291 } ];
         const kmRealiPortoCasarsa = { "PORTOGRUARO": 0.0, "TEGLIO VENETO": 3.9, "CORDOVADO SESTO": 8.6, "S.VITO": 15.9, "SAN VITO": 15.9, "VITO AL TAGLIAMENTO": 15.9, "S.GIOVANNI": 19.4, "SAN GIOVANNI": 19.4, "GIOVANNI DI CASARSA": 19.4, "CASARSA": 21.1 };
         const kmRealiSacileManiago = { "SACILE": 0.0, "LIBERALE": 2.0, "BUDOIA": 10.4, "AVIANO": 16.1, "MONTEREALE": 27.2, "MANIAGO": 32.2 };
-        
-        // NUOVA TRATTA: VENEZIA MESTRE - S.LUCIA
         const kmRealiMestreSantaLucia = { "VENEZIA MESTRE": 257.90, "PORTO MARGHERA": 260.19, "S.LUCIA": 266.34 };
-        const capisaldiGpsMestreSantaLucia = [
-            { km: 259, lat: 45.479134, lon: 12.244667 },
-            { km: 260, lat: 45.473811, lon: 12.254119 }
-        ];
+        const capisaldiGpsMestreSantaLucia = [ { km: 259, lat: 45.479134, lon: 12.244667 }, { km: 260, lat: 45.473811, lon: 12.254119 } ];
 
         /* =========================================================================
            2. COLLEGAMENTI DOM & VARIABILI GLOBALI
@@ -425,6 +368,7 @@
         let osmLayer, railwayLayer;
         let mainLayerGroup = L.featureGroup();
         let tratte = []; 
+        let autoSelezioneFatta = false; // FLAG PER CONTROLLARE SE L'AUTO-SELEZIONE E' STATA GIA' ESEGUITA
 
         /* =========================================================================
            3. FUNZIONI UTILITY GENERALI
@@ -449,13 +393,6 @@
             let t = ((lat - lat1) * (lat2 - lat1) + (lon - lon1) * (lon2 - lon1)) / l2;
             t = Math.max(0, Math.min(1, t)); 
             return { dist: getDistance(lat, lon, lat1 + t * (lat2 - lat1), lon1 + t * (lon2 - lon1)), t: t };
-        }
-
-        function getRandomColor() {
-            const letters = '0123456789ABCDEF';
-            let color = '#';
-            for (let i = 0; i < 6; i++) color += letters[Math.floor(Math.random() * 16)];
-            return color;
         }
 
         function svuotaCacheRFI() {
@@ -627,7 +564,7 @@
                 const tratteMap = new Map();
                 
                 Object.keys(featuresByTratta).forEach(nomeTratta => {
-                    if (LINEE_ESCLUSE.some(linea => nomeTratta.toUpperCase().includes(linea.toUpperCase()))) return;
+                    if (!TRATTE_AMMESSE.includes(nomeTratta)) return;
                     
                     let coloreAssegnato = COLORI_FISSI[nomeTratta];
                     if (!coloreAssegnato) {
@@ -759,7 +696,6 @@
                 let trattaSAMA = tratteMap.get(nomeSuper4);
                 if (trattaSAMA) applicaCalibrazioneStazioni(trattaSAMA, kmRealiSacileManiago);
                 
-                // NUOVA CALIBRAZIONE VENEZIA MESTRE - VENEZIA S.LUCIA
                 let trattaMEVE = tratteMap.get(nomeSuper9);
                 if (trattaMEVE) applicaCalibrazioneStazioniEGps(trattaMEVE, kmRealiMestreSantaLucia, capisaldiGpsMestreSantaLucia);
 
@@ -775,8 +711,6 @@
                         cat = "Regionale FVG";
                     }
                                         
-                    if (["EMILIA", "LOMBARDIA", "TRENTINO", "VENETO"].some(escl => cat.includes(escl))) return;
-                    
                     t.idx = tratte.length; 
                     tratte.push(t);
                                         
@@ -805,16 +739,8 @@
                                                             
                     if (cat === "Regionale FVG") {
                         const ordinePersonalizzato = [
-                            nomeSuper2, // UDINE - VENEZIA MESTRE
-                            nomeSuper1, // UDINE - BIVIO S.POLO
-                            nomeSuper3, // UDINE - TARVISIO BOSCOVERDE
-                            nomeSuper8, // UDINE - CERVIGNANO A.G.
-                            nomeSuper7, // TRIESTE CENTRALE - BIVIO S.POLO
-                            nomeSuper6, // BIVIO SAN POLO - MESTRE
-                            nomeSuper9, // VENEZIA MESTRE - VENEZIA S.LUCIA
-                            nomeSuper5, // CASARSA - PORTOGRUARO
-                            nomeSuper4, // SACILE - MANIAGO
-                            "P.M. VAT - UDINE PARCO"
+                            nomeSuper2, nomeSuper1, nomeSuper3, nomeSuper8, nomeSuper7, 
+                            nomeSuper6, nomeSuper9, nomeSuper5, nomeSuper4, "P.M. VAT - UDINE PARCO"
                         ].map(n => n.toUpperCase());
 
                         raggruppamento[cat].sort((a, b) => {
@@ -827,14 +753,8 @@
                         raggruppamento[cat].forEach(t => {
                             let posAttuale = ordinePersonalizzato.indexOf(t.nome.toUpperCase());
                             
-                            if (indicePrec !== -1 && (
-                                (indicePrec === 3 && posAttuale === 4) || 
-                                (indicePrec === 6 && posAttuale === 7) ||
-                                (indicePrec === 8 && posAttuale === 9)
-                            )) {
-                                const spaziatore = document.createElement('div');
-                                spaziatore.style.height = "12px"; 
-                                det.appendChild(spaziatore);
+                            if (indicePrec !== -1 && ((indicePrec === 3 && posAttuale === 4) || (indicePrec === 6 && posAttuale === 7) || (indicePrec === 8 && posAttuale === 9))) {
+                                const spaziatore = document.createElement('div'); spaziatore.style.height = "12px"; det.appendChild(spaziatore);
                             }
                             indicePrec = posAttuale;
 
@@ -842,7 +762,8 @@
                             let style = 'font-weight:bold; color:#d9534f;';
                             let nomeDaMostrare = nomiVisuali[t.nome.toUpperCase()] || t.nome;
                             
-                            lbl.innerHTML = `<input type="checkbox" onchange="toggleTratta(${t.idx}, this.checked)"><span style="color:${t.coloreLinea}; font-size:18px;">■</span> <span style="${style}">${nomeDaMostrare}</span>`;
+                            // AGGIUNTO ID ALLA CHECKBOX (es. chk-tratta-0)
+                            lbl.innerHTML = `<input type="checkbox" id="chk-tratta-${t.idx}" onchange="toggleTratta(${t.idx}, this.checked)"><span style="color:${t.coloreLinea}; font-size:18px;">■</span> <span style="${style}">${nomeDaMostrare}</span>`;
                             det.appendChild(lbl);
                         });
 
@@ -851,7 +772,9 @@
                          raggruppamento[cat].forEach(t => {
                             const lbl = document.createElement('label'); lbl.className = 'checkbox-container'; lbl.style.marginLeft = "15px";
                             let nomeDaMostrare = nomiVisuali[t.nome.toUpperCase()] || t.nome;
-                            lbl.innerHTML = `<input type="checkbox" onchange="toggleTratta(${t.idx}, this.checked)"><span style="color:${t.coloreLinea}; font-size:18px;">■</span> <span>${nomeDaMostrare}</span>`;
+                            
+                            // AGGIUNTO ID ALLA CHECKBOX
+                            lbl.innerHTML = `<input type="checkbox" id="chk-tratta-${t.idx}" onchange="toggleTratta(${t.idx}, this.checked)"><span style="color:${t.coloreLinea}; font-size:18px;">■</span> <span>${nomeDaMostrare}</span>`;
                             det.appendChild(lbl);
                         });
                      }
@@ -861,6 +784,11 @@
                 
                 statusText.innerText = "Sistema pronto! Dati in memoria.";
                 aggiornaVisualizzazione();
+
+                // SE IL GPS E' GIA' PRONTO MA I DATI RFI CI HANNO MESSO UN PO', FORZA L'AGGIORNAMENTO
+                if (ultimaPosizioneGps) {
+                    updateLocation(ultimaPosizioneGps);
+                }
 
             } catch (e) { 
                  statusText.innerText = "Errore connessione RFI. Verifica la rete."; 
@@ -930,7 +858,7 @@
         }
 
         /* =========================================================================
-           8. CORE GESTIONE GEOLOCALIZZAZIONE LIVE (GPS)
+           8. CORE GESTIONE GEOLOCALIZZAZIONE LIVE E AUTO-SELEZIONE
            ========================================================================= */
         function updateLocation(pos) {
             ultimaPosizioneGps = pos; 
@@ -950,10 +878,43 @@
                     map.setView([latitude, longitude]); 
                  }
             }
+
+            // --- LOGICA DI AUTO-SELEZIONE (Eseguita solo una volta) ---
+            if (!autoSelezioneFatta && tratte.length > 0) {
+                let idTrattaPiuVicina = -1;
+                let distMinimaAssoluta = Infinity;
+
+                // Scorre TUTTE le tratte (anche quelle spente) per trovare la più vicina
+                tratte.forEach((t) => {
+                    for (let i = 0; i < t.punti.length - 1; i++) {
+                        let m = getDistanceToSegment(latitude, longitude, t.punti[i].lat, t.punti[i].lon, t.punti[i+1].lat, t.punti[i+1].lon);
+                        if (m.dist < distMinimaAssoluta) {
+                            distMinimaAssoluta = m.dist;
+                            idTrattaPiuVicina = t.idx; // Salva l'ID corretto
+                        }
+                    }
+                });
+
+                // Se ci troviamo a meno di 5 km da una linea ferroviaria conosciuta
+                if (idTrattaPiuVicina !== -1 && distMinimaAssoluta < 5) {
+                    tratte[idTrattaPiuVicina].attiva = true;
+                    
+                    // Mette fisicamente la "spunta" nella casellina del pannello
+                    const chk = document.getElementById(`chk-tratta-${idTrattaPiuVicina}`);
+                    if (chk) chk.checked = true;
+                    
+                    aggiornaVisualizzazione();
+                    statusText.innerText = `GPS Acceso. Linea auto-selezionata.`;
+                }
+                
+                autoSelezioneFatta = true; // Impedisce che questo blocco venga rieseguito
+            }
+            // ----------------------------------------------------------
                                     
             let best = null, nStaz = null, dMin = Infinity;
             tratte.forEach(t => {
-                if (!t.attiva) return;
+                if (!t.attiva) return; // Da qui in poi calcola la progressiva SOLO per le linee attive
+                
                 t.punti.forEach(s => { 
                      if (s.isStazione) { 
                          let d = getDistance(latitude, longitude, s.lat, s.lon); 

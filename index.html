@@ -353,6 +353,34 @@
         const kmRealiSacileManiago = { "SACILE": 0.0, "LIBERALE": 2.0, "BUDOIA": 10.4, "AVIANO": 16.1, "MONTEREALE": 27.2, "MANIAGO": 32.2 };
         const kmRealiMestreSantaLucia = { "VENEZIA MESTRE": 257.90, "PORTO MARGHERA": 260.19, "S.LUCIA": 266.34 };
         const capisaldiGpsMestreSantaLucia = [ { km: 259, lat: 45.479134, lon: 12.244667 }, { km: 260, lat: 45.473811, lon: 12.254119 } ];
+        
+        // CAPISALDI CASARSA PORTOGRUARO AGGIORNATI CON IL KM 15.99
+        const capisaldiGpsCasarsaPortogruaro = [
+            { km: 1, lat: 45.786690, lon: 12.841830 },
+            { km: 5, lat: 45.818891, lon: 12.864544 },
+            { km: 5.12, lat: 45.819977, lon: 12.865018 },
+            { km: 7.11, lat: 45.837223, lon: 12.872215 },
+            { km: 8.55, lat: 45.849542, lon: 12.877340 },
+            { km: 9, lat: 45.853659, lon: 12.879057 },
+            { km: 9.05, lat: 45.853957, lon: 12.879185 },
+            { km: 10, lat: 45.862673, lon: 12.879779 },
+            { km: 10.52, lat: 45.867048, lon: 12.878823 },
+            { km: 11.32, lat: 45.873749, lon: 12.874869 },
+            { km: 12.48, lat: 45.883409, lon: 12.869158 },
+            { km: 14.08, lat: 45.896649, lon: 12.861318 },
+            { km: 14.56, lat: 45.900656, lon: 12.858753 },
+            { km: 15.07, lat: 45.904861, lon: 12.856061 },
+            { km: 15.99, lat: 45.912357, lon: 12.851657 },
+            { km: 16.21, lat: 45.914327, lon: 12.850540 },
+            { km: 16.41, lat: 45.915947, lon: 12.849597 },
+            { km: 17.31, lat: 45.923603, lon: 12.845457 },
+            { km: 18.47, lat: 45.933350, lon: 12.840413 },
+            { km: 18.95, lat: 45.937503, lon: 12.838252 },
+            { km: 19, lat: 45.937860, lon: 12.838066 },
+            { km: 19.47, lat: 45.941908, lon: 12.835968 },
+            { km: 19.65, lat: 45.943406, lon: 12.835121 },
+            { km: 20.10, lat: 45.947145, lon: 12.833013 }
+        ];
 
         /* =========================================================================
            2. COLLEGAMENTI DOM & VARIABILI GLOBALI
@@ -691,7 +719,7 @@
                 if (trattaUDVE) applicaCalibrazioneStazioniEGps(trattaUDVE, kmRealiUdineMestre, capisaldiGpsUdineMestre);
 
                 let trattaPGCS = tratteMap.get(nomeSuper5);
-                if (trattaPGCS) applicaCalibrazioneStazioni(trattaPGCS, kmRealiPortoCasarsa);
+                if (trattaPGCS) applicaCalibrazioneStazioniEGps(trattaPGCS, kmRealiPortoCasarsa, capisaldiGpsCasarsaPortogruaro);
                 
                 let trattaSAMA = tratteMap.get(nomeSuper4);
                 if (trattaSAMA) applicaCalibrazioneStazioni(trattaSAMA, kmRealiSacileManiago);
@@ -762,7 +790,6 @@
                             let style = 'font-weight:bold; color:#d9534f;';
                             let nomeDaMostrare = nomiVisuali[t.nome.toUpperCase()] || t.nome;
                             
-                            // AGGIUNTO ID ALLA CHECKBOX (es. chk-tratta-0)
                             lbl.innerHTML = `<input type="checkbox" id="chk-tratta-${t.idx}" onchange="toggleTratta(${t.idx}, this.checked)"><span style="color:${t.coloreLinea}; font-size:18px;">■</span> <span style="${style}">${nomeDaMostrare}</span>`;
                             det.appendChild(lbl);
                         });
@@ -773,7 +800,6 @@
                             const lbl = document.createElement('label'); lbl.className = 'checkbox-container'; lbl.style.marginLeft = "15px";
                             let nomeDaMostrare = nomiVisuali[t.nome.toUpperCase()] || t.nome;
                             
-                            // AGGIUNTO ID ALLA CHECKBOX
                             lbl.innerHTML = `<input type="checkbox" id="chk-tratta-${t.idx}" onchange="toggleTratta(${t.idx}, this.checked)"><span style="color:${t.coloreLinea}; font-size:18px;">■</span> <span>${nomeDaMostrare}</span>`;
                             det.appendChild(lbl);
                         });
@@ -785,7 +811,6 @@
                 statusText.innerText = "Sistema pronto! Dati in memoria.";
                 aggiornaVisualizzazione();
 
-                // SE IL GPS E' GIA' PRONTO MA I DATI RFI CI HANNO MESSO UN PO', FORZA L'AGGIORNAMENTO
                 if (ultimaPosizioneGps) {
                     updateLocation(ultimaPosizioneGps);
                 }
@@ -879,27 +904,23 @@
                  }
             }
 
-            // --- LOGICA DI AUTO-SELEZIONE (Eseguita solo una volta) ---
             if (!autoSelezioneFatta && tratte.length > 0) {
                 let idTrattaPiuVicina = -1;
                 let distMinimaAssoluta = Infinity;
 
-                // Scorre TUTTE le tratte (anche quelle spente) per trovare la più vicina
                 tratte.forEach((t) => {
                     for (let i = 0; i < t.punti.length - 1; i++) {
                         let m = getDistanceToSegment(latitude, longitude, t.punti[i].lat, t.punti[i].lon, t.punti[i+1].lat, t.punti[i+1].lon);
                         if (m.dist < distMinimaAssoluta) {
                             distMinimaAssoluta = m.dist;
-                            idTrattaPiuVicina = t.idx; // Salva l'ID corretto
+                            idTrattaPiuVicina = t.idx; 
                         }
                     }
                 });
 
-                // Se ci troviamo a meno di 5 km da una linea ferroviaria conosciuta
                 if (idTrattaPiuVicina !== -1 && distMinimaAssoluta < 5) {
                     tratte[idTrattaPiuVicina].attiva = true;
                     
-                    // Mette fisicamente la "spunta" nella casellina del pannello
                     const chk = document.getElementById(`chk-tratta-${idTrattaPiuVicina}`);
                     if (chk) chk.checked = true;
                     
@@ -907,13 +928,12 @@
                     statusText.innerText = `GPS Acceso. Linea auto-selezionata.`;
                 }
                 
-                autoSelezioneFatta = true; // Impedisce che questo blocco venga rieseguito
+                autoSelezioneFatta = true; 
             }
-            // ----------------------------------------------------------
                                     
             let best = null, nStaz = null, dMin = Infinity;
             tratte.forEach(t => {
-                if (!t.attiva) return; // Da qui in poi calcola la progressiva SOLO per le linee attive
+                if (!t.attiva) return; 
                 
                 t.punti.forEach(s => { 
                      if (s.isStazione) { 

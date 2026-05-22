@@ -7,113 +7,122 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <style>
         /* =========================================================================
-           1. VARIABILI DI TEMA (CHIARO / SCURO)
+           1. VARIABILI DI TEMA (CHIARO / SCURO - STILE APPLE)
            ========================================================================= */
         :root {
-            --bg-color: #f0f2f5;
-            --container-bg: white;
-            --text-color: #333;
-            --primary-color: #0056b3;
-            --info-bg: #eef6ff;
-            --info-border: #0056b3;
-            --panel-bg: #f8f9fa;
-            --border-color: #ddd;
-            --note-color: #666;
+            --bg-color: #F2F2F7;
+            --container-bg: #FFFFFF;
+            --text-color: #1C1C1E;
+            --primary-color: #007AFF;
+            --info-bg: #F5F5F9;
+            --panel-bg: #FFFFFF;
+            --border-color: rgba(60, 60, 67, 0.12);
+            --note-color: #8E8E93;
+            --toggle-bg: #E5E5EA;
+            --toggle-on: #34C759;
+            --shadow-color: rgba(0, 0, 0, 0.08);
         }
 
         body.dark-mode {
-            --bg-color: #121212;
-            --container-bg: #1e1e1e;
-            --text-color: #e0e0e0;
-            --primary-color: #4da3ff;
-            --info-bg: #2a3b4c;
-            --info-border: #4da3ff;
-            --panel-bg: #252525;
-            --border-color: #444;
-            --note-color: #aaa;
+            --bg-color: #000000;
+            --container-bg: #1C1C1E;
+            --text-color: #F2F2F7;
+            --primary-color: #0A84FF;
+            --info-bg: #2C2C2E;
+            --panel-bg: #1C1C1E;
+            --border-color: rgba(84, 84, 88, 0.65);
+            --note-color: #EBEBF5;
+            --toggle-bg: #39393D;
+            --toggle-on: #30D158;
+            --shadow-color: rgba(0, 0, 0, 0.4);
         }
 
         /* =========================================================================
            2. STILI LAYOUT PRINCIPALE
            ========================================================================= */
         body {
-             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+             font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
              background-color: var(--bg-color);
              color: var(--text-color);
              margin: 0;
-             padding: 10px;
+             padding: 15px;
              display: flex;
              flex-direction: column;
              align-items: center;
-             transition: background-color 0.3s, color 0.3s;
+             transition: background-color 0.4s ease, color 0.4s ease;
+             -webkit-font-smoothing: antialiased;
          }
 
         .container {
              background: var(--container-bg);
-             padding: 20px;
-             border-radius: 20px;
-             box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+             padding: 24px;
+             border-radius: 24px;
+             box-shadow: 0 10px 30px var(--shadow-color);
              width: 100%;
              max-width: 700px;
              text-align: center;
              box-sizing: border-box;
-             transition: background-color 0.3s;
+             transition: background-color 0.4s ease, box-shadow 0.4s ease;
          }
 
         .header-container {
              display: flex;
              justify-content: space-between;
              align-items: center;
-             margin-bottom: 15px;
+             margin-bottom: 20px;
          }
 
         h1 {
-             font-size: 20px;
-             color: var(--primary-color);
+             font-size: 22px;
+             font-weight: 700;
+             letter-spacing: -0.5px;
+             color: var(--text-color);
              margin: 0;
          }
 
         .theme-btn {
-             background: none;
-             border: 1px solid var(--border-color);
+             background: var(--info-bg);
+             border: none;
              color: var(--text-color);
-             font-size: 20px;
+             font-size: 18px;
              cursor: pointer;
-             padding: 5px 10px;
-             border-radius: 8px;
-             transition: 0.3s;
+             padding: 8px 12px;
+             border-radius: 12px;
+             transition: background-color 0.2s ease, transform 0.1s;
          }
 
-        .theme-btn:hover {
-             background: var(--panel-bg);
+        .theme-btn:active {
+             transform: scale(0.95);
          }
 
         /* =========================================================================
            3. BOX INFORMAZIONI E CONTROLLI
            ========================================================================= */
         .info-box {
-             margin-bottom: 15px;
-             padding: 15px;
+             margin-bottom: 20px;
+             padding: 20px;
              background-color: var(--info-bg);
-             border-left: 5px solid var(--info-border);
-             border-radius: 8px;
+             border-radius: 16px;
              text-align: left;
-             transition: 0.3s;
+             transition: 0.4s ease;
          }
 
         .km-label-main {
-             font-size: 28px;
-             font-weight: bold;
-             color: #d9534f;
-             margin-top: 5px;
+             font-size: 34px;
+             font-weight: 800;
+             letter-spacing: -1px;
+             color: var(--primary-color);
+             margin-top: 8px;
+             text-align: center;
          }
 
         #map {
              height: 450px;
              width: 100%;
-             border-radius: 12px;
+             border-radius: 16px;
              border: 1px solid var(--border-color);
              z-index: 1;
+             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
          }
 
         .leaflet-container {
@@ -121,136 +130,176 @@
          }
 
         .btn-gps {
-             background-color: #007bff;
+             background-color: var(--primary-color);
              color: white;
              border: none;
-             padding: 14px;
+             padding: 16px;
              font-size: 16px;
-             border-radius: 10px;
-             margin-top: 15px;
+             border-radius: 14px;
+             margin-top: 20px;
              cursor: pointer;
              width: 100%;
-             font-weight: bold;
-             transition: background 0.3s;
-             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+             font-weight: 600;
+             transition: background-color 0.2s, transform 0.1s, box-shadow 0.2s;
          }
 
-        .btn-gps:hover {
-             background-color: #0056b3;
+        .btn-gps:active {
+             transform: scale(0.98);
          }
 
         .btn-clear-cache {
-             background-color: #6c757d;
-             margin-top: 10px;
-             font-size: 14px;
-             padding: 10px;
+             background-color: var(--info-bg);
+             color: var(--primary-color);
+             margin-top: 15px;
+             font-size: 15px;
+             padding: 14px;
          }
 
         .btn-clear-cache:hover {
-             background-color: #5a6268;
+             background-color: var(--border-color);
          }
 
         /* =========================================================================
-           4. PANNELLO OPZIONI E LISTA TRATTE
+           4. PANNELLO OPZIONI E CHECKBOX STILE iOS
            ========================================================================= */
         .options-panel {
-             margin-top: 15px;
+             margin-top: 20px;
              background: var(--panel-bg);
-             padding: 15px;
-             border-radius: 8px;
-             border: 1px solid var(--border-color);
+             padding: 0;
+             border-radius: 16px;
              text-align: left;
              display: flex;
              flex-direction: column;
-             gap: 15px;
-             transition: 0.3s;
+             gap: 20px;
          }
 
         .options-section {
              display: flex;
              flex-direction: column;
-             gap: 8px;
+             gap: 4px; /* Ridotto da 12px a 4px per avvicinare le righe */
+             background: var(--info-bg);
+             padding: 16px;
+             border-radius: 16px;
          }
 
         .options-title {
-             font-size: 14px;
-             font-weight: bold;
-             color: var(--text-color);
-             border-bottom: 1px solid var(--border-color);
-             padding-bottom: 5px;
-             margin-bottom: 5px;
-         }
-
-        #toggles-tratte {
-             padding-right: 5px;
-             border: 1px solid var(--border-color);
-             padding: 10px;
-             border-radius: 5px;
-             background: var(--container-bg);
+             font-size: 15px;
+             font-weight: 600;
+             color: var(--note-color);
+             text-transform: uppercase;
+             letter-spacing: 0.5px;
+             margin-bottom: -5px;
+             margin-top: 10px;
+             padding-left: 5px;
          }
 
         .checkbox-container {
-             font-size: 14px;
+             font-size: 15px;
+             font-weight: 500;
              display: flex;
              align-items: center;
-             gap: 8px;
+             gap: 12px;
              cursor: pointer;
              color: var(--text-color);
-             margin-bottom: 6px;
+             margin-bottom: 2px; /* Ridotto da 8px a 2px */
+             padding: 2px 0; /* Ridotto il padding verticale da 5px a 2px */
         }
 
-        .checkbox-container input {
+        .checkbox-container input[type="checkbox"] {
+             appearance: none;
+             -webkit-appearance: none;
+             width: 44px;
+             height: 24px;
+             background-color: var(--toggle-bg);
+             border-radius: 24px;
+             position: relative;
              cursor: pointer;
-             width: 16px;
-             height: 16px;
+             outline: none;
+             transition: background-color 0.3s ease;
+             flex-shrink: 0;
          }
 
+        .checkbox-container input[type="checkbox"]::after {
+             content: '';
+             position: absolute;
+             top: 2px;
+             left: 2px;
+             width: 20px;
+             height: 20px;
+             background-color: #FFFFFF;
+             border-radius: 50%;
+             box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+             transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+         }
+
+        .checkbox-container input[type="checkbox"]:checked {
+             background-color: var(--toggle-on);
+         }
+
+        .checkbox-container input[type="checkbox"]:checked::after {
+             transform: translateX(20px);
+         }
+
+        /* =========================================================================
+           6. DETTAGLI DELLA MAPPA E STATO
+           ========================================================================= */
         .km-icon {
              display: flex;
              justify-content: center;
              align-items: center;
          }
-
+        
         .km-icon div {
-             background-color: rgba(255, 255, 255, 0.9);
-             border: 1px solid #28a745;
-             color: #1a7e33;
-             font-size: 10px;
-             font-weight: bold;
-             padding: 1px 4px;
-             border-radius: 4px;
-             box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+             background-color: rgba(255, 255, 255, 0.95);
+             border: 1px solid var(--border-color);
+             color: var(--text-color);
+             font-size: 11px;
+             font-weight: 700;
+             padding: 2px 6px;
+             border-radius: 10px;
+             box-shadow: 0 2px 6px rgba(0,0,0,0.15);
              white-space: nowrap;
          }
 
         .small-note {
-             font-size: 12px;
+             font-size: 13px;
              color: var(--note-color);
-             margin-top: 10px;
+             margin-top: 5px;
          }
 
         .gps-stats {
              display: flex;
-             justify-content: center;
+             justify-content: flex-start;
+             margin-top: 15px;
+             padding-top: 15px;
              border-top: 1px solid var(--border-color);
-             margin-top: 10px;
-             padding-top: 10px;
-             font-size: 13px;
+             font-size: 14px;
              color: var(--note-color);
+             font-weight: 500;
          }
 
         #status {
-             font-weight: bold;
+             font-weight: 600;
              color: var(--primary-color);
+             margin-top: 15px;
+             display: inline-block;
          }
 
+        /* Modifica: Rimuoviamo la freccia e togliamo il cursore a manina */
         details summary {
              outline: none;
              transition: color 0.3s;
+             font-size: 16px;
+             padding: 10px 0;
+             margin-bottom: 5px;
+             font-weight: bold;
+             cursor: default; /* Non sembra più cliccabile */
+             list-style: none; /* Nasconde la freccia sui browser moderni */
          }
 
-        details summary:hover {
-             color: #d9534f !important;
+        /* Nasconde la freccia su Safari e Chrome */
+        details summary::-webkit-details-marker {
+             display: none;
          }
     </style>
 </head>
@@ -265,8 +314,20 @@
             <div id="stazione-vicina">Calcolo posizione...</div>
             <div id="km-attuale" class="km-label-main">---</div>
             <div id="tratta-attiva" class="small-note">---</div>
-            <div class="gps-stats">
+            
+            <!-- ABBIAMO MODIFICATO QUESTA SEZIONE (GPS STATS) -->
+            <div class="gps-stats" style="flex-direction: column; gap: 10px;">
                 <div>📡 Precisione: <span id="gps-accuracy">Ricerca...</span></div>
+                
+                <!-- Questo è il nuovo interruttore stile iOS -->
+                <label class="checkbox-container" style="font-size: 13px; margin-bottom: 0;">
+                    <input type="checkbox" id="toggle-coords" onchange="toggleCordinate()"> Mostra coordinate GPS
+                </label>
+                
+                <!-- Questo è il box che contiene le coordinate. È nascosto all'inizio (display: none) -->
+                <div id="gps-coords-display" style="display: none; font-size: 13px; font-family: monospace; color: var(--note-color); background: var(--panel-bg); padding: 10px; border-radius: 8px; border: 1px solid var(--border-color);">
+                    Lat: --- <br> Lon: ---
+                </div>
             </div>
         </div>
 
@@ -277,15 +338,17 @@
         <div class="options-panel">
             <div class="options-section">
                 <div class="options-title">⚙️ Impostazioni Navigazione</div>
-                <label class="checkbox-container"><input type="checkbox" id="toggle-autocenter" checked> 🎯 Segui automaticamente posizione GPS</label>
-                <label class="checkbox-container"><input type="checkbox" id="toggle-bg" onchange="toggleBackground(this)"> 🗺️ Nascondi mappa stradale</label>
-                <label class="checkbox-container"><input type="checkbox" id="toggle-cippi" checked onchange="aggiornaVisualizzazione()"> 📏 Mostra cippi chilometrici (Zoom &ge; 12)</label>
-                <label class="checkbox-container"><input type="checkbox" id="toggle-stazioni" checked onchange="aggiornaVisualizzazione()"> 🚉 Mostra stazioni ferroviarie</label>
+                <label class="checkbox-container"><input type="checkbox" id="toggle-autocenter" checked> Seguimi automaticamente (GPS)</label>
+                <label class="checkbox-container"><input type="checkbox" id="toggle-cippi" checked onchange="aggiornaVisualizzazione()"> Mostra cippi chilometrici (Zoom &ge; 12)</label>
+                <label class="checkbox-container"><input type="checkbox" id="toggle-stazioni" checked onchange="aggiornaVisualizzazione()"> Mostra stazioni ferroviarie</label>
+                <label class="checkbox-container"><input type="checkbox" id="toggle-bg" onchange="toggleBackground(this)"> Nascondi mappa stradale</label>
             </div>
 
-            <div class="options-title">🚆 Tratte Disponibili</div>
-            <div class="options-section" id="toggles-tratte">
-                <div style="text-align: center; color: #888; font-style: italic;">Caricamento dati RFI in corso...</div>
+            <div class="options-section">
+                <div class="options-title">🛤️ Tratte Disponibili</div>
+                <div id="toggles-tratte">
+                    <div style="text-align: center; color: #888; font-style: italic;">Caricamento dati RFI in corso...</div>
+                </div>
             </div>
 
             <button class="btn-gps btn-clear-cache" onclick="svuotaCacheRFI()">🔄 Riscarica dati RFI (Svuota Cache)</button>
@@ -294,6 +357,7 @@
         <div id="status" class="small-note">Inizializzazione...</div>
     </div>
 
+    <!-- Caricamento libreria Leaflet per le mappe -->
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script>
         /* =========================================================================
@@ -391,12 +455,13 @@
         const displayAccuracy = document.getElementById('gps-accuracy');
         const statusText = document.getElementById('status');
         const containerTratte = document.getElementById('toggles-tratte');
+        const displayCoords = document.getElementById('gps-coords-display'); // <- NUOVO COLLEGAMENTO DOM
 
         let map, userMarker, ultimaPosizioneGps = null;
         let osmLayer, railwayLayer;
         let mainLayerGroup = L.featureGroup();
         let tratte = []; 
-        let autoSelezioneFatta = false; // FLAG PER CONTROLLARE SE L'AUTO-SELEZIONE E' STATA GIA' ESEGUITA
+        let autoSelezioneFatta = false; 
 
         /* =========================================================================
            3. FUNZIONI UTILITY GENERALI
@@ -497,12 +562,70 @@
             ricalcolaSuAncore(tratta, ancore);
         }
 
+        function applicaCalibrazioneTrieste(tratta) {
+            const originalKms = tratta.punti.map(p => p.km); 
+
+            const capisaldi = [
+                { nome: "TRIESTE CENTRALE", kmReale: 0.0, cercaStazione: true },
+                { nome: "MIRAMARE", kmReale: 7.033, cercaStazione: true },
+                { nome: "GALLERIA_CRESCENTE", kmReale: 13.687, cercaStazione: false, targetGeomKm: 13.687 }, 
+                { nome: "GALLERIA_DECRESCENTE", kmReale: 131.31, cercaStazione: false, offsetDalPrecedente: 1 }, 
+                { nome: "BIVIO D'AURISINA", kmReale: 130.463, cercaStazione: true },
+                { nome: "SISTIANA", kmReale: 127.730, cercaStazione: true },
+                { nome: "MONFALCONE", kmReale: 117.746, cercaStazione: true },
+                { nome: "S.POLO", kmReale: 116.266, cercaStazione: false, targetLastPoint: true }
+            ];
+
+            let ancore = [];
+            let lastGalleriaIdx = -1;
+
+            capisaldi.forEach(caposaldo => {
+                let bestIdx = -1;
+                
+                if (caposaldo.cercaStazione) {
+                    tratta.punti.forEach((punto, index) => {
+                        if (punto.isStazione && punto.nome.toUpperCase().includes(caposaldo.nome)) {
+                            bestIdx = index;
+                        }
+                    });
+                } else if (caposaldo.targetGeomKm !== undefined) {
+                    let minDiff = Infinity;
+                    originalKms.forEach((geomKm, index) => {
+                        let diff = Math.abs(geomKm - caposaldo.targetGeomKm);
+                        if (diff < minDiff) {
+                            minDiff = diff;
+                            bestIdx = index;
+                        }
+                    });
+                    lastGalleriaIdx = bestIdx;
+                } else if (caposaldo.offsetDalPrecedente !== undefined) {
+                    if (lastGalleriaIdx !== -1 && lastGalleriaIdx + 1 < tratta.punti.length) {
+                        bestIdx = lastGalleriaIdx + 1;
+                    }
+                } else if (caposaldo.targetLastPoint) {
+                    bestIdx = tratta.punti.length - 1;
+                }
+                
+                if (bestIdx !== -1 && bestIdx < tratta.punti.length) {
+                    ancore.push({ 
+                        indice: bestIdx, 
+                        kmCalcolato: originalKms[bestIdx], 
+                        kmReale: caposaldo.kmReale, 
+                        nome: caposaldo.nome 
+                    });
+                }
+            });
+
+            ricalcolaSuAncore(tratta, ancore);
+        }
+
         function ricalcolaSuAncore(tratta, ancore) {
             ancore.sort((a, b) => a.indice - b.indice);
             if (ancore.length > 0) {
                 tratta.punti.forEach((punto, index) => {
                     let ancPrec = ancore.slice().reverse().find(a => a.indice <= index);
                     let ancSucc = ancore.find(a => a.indice >= index);
+                    
                     if (ancPrec && ancSucc) {
                         if (ancPrec.indice === ancSucc.indice) punto.km = ancPrec.kmReale;
                         else {
@@ -510,8 +633,17 @@
                             if (diffCalcolata === 0) punto.km = ancPrec.kmReale;
                             else punto.km = ancPrec.kmReale + ((punto.km - ancPrec.kmCalcolato) / diffCalcolata) * (ancSucc.kmReale - ancPrec.kmReale);
                         }
-                    } else if (ancPrec) punto.km = ancPrec.kmReale + Math.abs(punto.km - ancPrec.kmCalcolato);
-                    else if (ancSucc) punto.km = ancSucc.kmReale - Math.abs(ancSucc.kmCalcolato - punto.km);
+                    } else if (ancPrec) {
+                        let sign = 1;
+                        let idxA = ancore.indexOf(ancPrec);
+                        if (idxA > 0 && ancore[idxA - 1].kmReale > ancPrec.kmReale) sign = -1;
+                        punto.km = ancPrec.kmReale + sign * Math.abs(punto.km - ancPrec.kmCalcolato);
+                    } else if (ancSucc) {
+                        let sign = 1;
+                        let idxA = ancore.indexOf(ancSucc);
+                        if (idxA < ancore.length - 1 && ancore[idxA + 1].kmReale < ancSucc.kmReale) sign = -1;
+                        punto.km = ancSucc.kmReale - sign * Math.abs(ancSucc.kmCalcolato - punto.km);
+                    }
                 });
             }
         }
@@ -539,7 +671,7 @@
                     statusText.innerText = "Connessione ai server RFI in corso...";
                     const resStazioni = await fetch(urlStazioni);
                     dataStazioni = await resStazioni.json();
-                                                            
+                                        
                     const resTratte = await fetch(urlTratte);
                     dataTratte = await resTratte.json();
 
@@ -653,10 +785,10 @@
 
                     let curKm = 0, lLat = null, lLon = null;
                     chained.forEach(c => {
-                        if (lLat !== null) { 
-                             let d = getDistance(lLat, lLon, c[1], c[0]); 
-                             if (d < 25) curKm += d; 
-                         }
+                        if (lLat !== null) {  
+                            let d = getDistance(lLat, lLon, c[1], c[0]);  
+                            if (d < 25) curKm += d;  
+                        }
                         tObj.punti.push({ lat: c[1], lon: c[0], km: curKm, isStazione: false });
                         lLat = c[1]; lLon = c[0];
                     });
@@ -664,15 +796,14 @@
 
                 stazioniRFI.forEach(st => {
                     tratteMap.forEach(t => {
-                        if (t.nome === nomeSuper2) { 
-                             const escluse = ["CARPENEDO", "OLIMPIA", "FAGAR", "GORGO", "ODERZO", "MOTTA", "GAGGIO"];
-                            if (escluse.some(nomeEscluso => st.nome.toUpperCase().includes(nomeEscluso))) return; 
-                         }
-                        if (t.nome === nomeSuper6) { 
-                             const escluse = ["GAZZERA"];
-                            if (escluse.some(nomeEscluso => st.nome.toUpperCase().includes(nomeEscluso))) return; 
-                         }
-                         
+                        if (t.nome === nomeSuper2) {  
+                            const escluse = ["CARPENEDO", "OLIMPIA", "FAGAR", "GORGO", "ODERZO", "MOTTA", "GAGGIO"];
+                            if (escluse.some(nomeEscluso => st.nome.toUpperCase().includes(nomeEscluso))) return;  
+                        }
+                        if (t.nome === nomeSuper6) {  
+                            const escluse = ["GAZZERA"];
+                            if (escluse.some(nomeEscluso => st.nome.toUpperCase().includes(nomeEscluso))) return;  
+                        }                         
                         if (t.nome === nomeSuper4 && st.nome.toUpperCase() === "SACILE") return;
 
                         let bestPerLinea = null;
@@ -683,15 +814,15 @@
                             let m = getDistanceToSegment(st.lat, st.lon, t.punti[i].lat, t.punti[i].lon, t.punti[i+1].lat, t.punti[i+1].lon);
                             if (m.dist < bDist) {
                                 bDist = m.dist;
-                                bestPerLinea = { lat: st.lat, lon: st.lon, km: t.punti[i].km + m.t * (t.punti[i+1].km - t.punti[i].km), nome: st.nome, isStazione: true }; 
+                                bestPerLinea = { lat: st.lat, lon: st.lon, km: t.punti[i].km + m.t * (t.punti[i+1].km - t.punti[i].km), nome: st.nome, isStazione: true };
                                 bestInsertIdx = i + 1;
                             }
                         }
                         
-                        if (bestPerLinea) { 
-                             t.stazioniDaInserire.push({stazione: bestPerLinea, idx: bestInsertIdx});
-                             if (st.regione) t.regioniTrovate.add(st.regione.toUpperCase()); 
-                         }
+                        if (bestPerLinea) {  
+                            t.stazioniDaInserire.push({stazione: bestPerLinea, idx: bestInsertIdx}); 
+                            if (st.regione) t.regioniTrovate.add(st.regione.toUpperCase());  
+                        }
                     });
                 });
                 
@@ -708,7 +839,6 @@
                     }
                 });
 
-                // ESECUZIONE CALIBRAZIONI
                 let trataSPM = tratteMap.get(nomeSuper6);
                 if (trataSPM) applicaCalibrazioneStazioni(trataSPM, kmRealiSanPoloMestre, stazioniRFI);
 
@@ -727,21 +857,23 @@
                 let trattaMEVE = tratteMap.get(nomeSuper9);
                 if (trattaMEVE) applicaCalibrazioneStazioniEGps(trattaMEVE, kmRealiMestreSantaLucia, capisaldiGpsMestreSantaLucia);
 
-                // Generazione visiva del selettore tratte
+                let trattaTSBP = tratteMap.get(nomeSuper7);
+                if (trattaTSBP) applicaCalibrazioneTrieste(trattaTSBP);
+
                 containerTratte.innerHTML = "";
                 let raggruppamento = {};
                 
                 Array.from(tratteMap.values()).forEach((t) => {
                     let regArray = Array.from(t.regioniTrovate);
                     let cat = regArray.length === 1 ? regArray[0] : "Interregionali/Altro";
-                                        
+                    
                     if (t.nome === nomeSuper1 || t.nome === nomeSuper2 || t.nome === nomeSuper3 || t.nome === nomeSuper4 || t.nome === nomeSuper5 || t.nome === nomeSuper6 || t.nome === nomeSuper7 || t.nome === nomeSuper8 || t.nome === nomeSuper9 || t.nome.toUpperCase() === "P.M. VAT - UDINE PARCO") {
                         cat = "Regionale FVG";
                     }
-                                        
+                    
                     t.idx = tratte.length; 
                     tratte.push(t);
-                                        
+                    
                     if (cat.includes("FRIULI")) cat = "Friuli Venezia Giulia";
                     if (!raggruppamento[cat]) raggruppamento[cat] = [];
                     raggruppamento[cat].push(t);
@@ -760,11 +892,9 @@
                 };
 
                 chiaviOrdinate.forEach(cat => {
-                    const det = document.createElement('details'); det.open = true; det.style.marginBottom = "10px";
-                    const sum = document.createElement('summary'); sum.style.fontWeight = "bold"; sum.style.cursor = "pointer"; sum.style.color = "var(--primary-color)"; sum.style.borderBottom = "1px solid var(--border-color)";
-                    sum.innerHTML = `📍 ${cat} (${raggruppamento[cat].length})`;
-                    det.appendChild(sum);
-                                                            
+                    // Usiamo un semplice <div> invece di <details> per togliere la tendina
+                    const det = document.createElement('div'); det.style.marginBottom = "10px";
+                    
                     if (cat === "Regionale FVG") {
                         const ordinePersonalizzato = [
                             nomeSuper2, nomeSuper1, nomeSuper3, nomeSuper8, nomeSuper7, 
@@ -781,8 +911,11 @@
                         raggruppamento[cat].forEach(t => {
                             let posAttuale = ordinePersonalizzato.indexOf(t.nome.toUpperCase());
                             
+                            // Inseriamo lo spaziatore per creare i gruppi logici (doppio spazio)
                             if (indicePrec !== -1 && ((indicePrec === 3 && posAttuale === 4) || (indicePrec === 6 && posAttuale === 7) || (indicePrec === 8 && posAttuale === 9))) {
-                                const spaziatore = document.createElement('div'); spaziatore.style.height = "12px"; det.appendChild(spaziatore);
+                                const spaziatore = document.createElement('div'); 
+                                spaziatore.style.height = "24px"; /* Aumentato a 24px per un distacco netto */
+                                det.appendChild(spaziatore);
                             }
                             indicePrec = posAttuale;
 
@@ -794,16 +927,16 @@
                             det.appendChild(lbl);
                         });
 
-                    } else { 
-                         raggruppamento[cat].sort((a,b) => a.nome.localeCompare(b.nome)); 
-                         raggruppamento[cat].forEach(t => {
+                    } else {  
+                        raggruppamento[cat].sort((a,b) => a.nome.localeCompare(b.nome));  
+                        raggruppamento[cat].forEach(t => {
                             const lbl = document.createElement('label'); lbl.className = 'checkbox-container'; lbl.style.marginLeft = "15px";
                             let nomeDaMostrare = nomiVisuali[t.nome.toUpperCase()] || t.nome;
                             
                             lbl.innerHTML = `<input type="checkbox" id="chk-tratta-${t.idx}" onchange="toggleTratta(${t.idx}, this.checked)"><span style="color:${t.coloreLinea}; font-size:18px;">■</span> <span>${nomeDaMostrare}</span>`;
                             det.appendChild(lbl);
-                        });
-                     }
+                        }); 
+                    }
                     
                     containerTratte.appendChild(det);
                 });
@@ -815,14 +948,14 @@
                     updateLocation(ultimaPosizioneGps);
                 }
 
-            } catch (e) { 
-                 statusText.innerText = "Errore connessione RFI. Verifica la rete."; 
-                 console.error(e); 
-             }
+            } catch (e) {  
+                statusText.innerText = "Errore connessione RFI. Verifica la rete.";  
+                console.error(e);  
+            }
         }
 
         /* =========================================================================
-           6. SETUP INIZIALE MAPPA (LEAFLET) & COORD_LAYERS
+           6. SETUP INIZIALE MAPPA (LEAFLET)
            ========================================================================= */
         map = L.map('map').setView([46.1, 13.1], 9);
         mainLayerGroup.addTo(map);
@@ -831,11 +964,18 @@
 
         function toggleBackground(c) { osmLayer.setOpacity(c.checked ? 0 : 1); }
         
-        window.toggleTratta = (i, c) => { 
-             tratte[i].attiva = c; 
-             aggiornaVisualizzazione(); 
-             if (ultimaPosizioneGps) updateLocation(ultimaPosizioneGps); 
-         };
+        // NUOVA FUNZIONE: Mostra/Nascondi le coordinate
+        window.toggleCordinate = () => {
+            const isChecked = document.getElementById('toggle-coords').checked;
+            // Se l'interruttore è acceso, usa "block" per mostrarlo, altrimenti "none" per nasconderlo
+            displayCoords.style.display = isChecked ? 'block' : 'none';
+        };
+        
+        window.toggleTratta = (i, c) => {  
+            tratte[i].attiva = c;  
+            aggiornaVisualizzazione();  
+            if (ultimaPosizioneGps) updateLocation(ultimaPosizioneGps);  
+        };
 
         /* =========================================================================
            7. RENDER GRAFICO (LINEE, CIPPI, STAZIONI)
@@ -850,20 +990,21 @@
                 if (!t.attiva) return;
                 let pts = [];
                 for(let i=0; i<t.punti.length; i++) {
-                    if (i > 0 && Math.abs(t.punti[i].km - t.punti[i-1].km) > 20) { 
-                         L.polyline(pts, {color: t.coloreLinea, weight: 4}).addTo(mainLayerGroup); 
-                         pts = []; 
-                     }
+                    if (i > 0 && Math.abs(t.punti[i].km - t.punti[i-1].km) > 20) {  
+                        L.polyline(pts, {color: t.coloreLinea, weight: 4}).addTo(mainLayerGroup);  
+                        pts = [];  
+                    }
                     pts.push([t.punti[i].lat, t.punti[i].lon]);
                 }
                 L.polyline(pts, {color: t.coloreLinea, weight: 4}).addTo(mainLayerGroup);
-                                                
+                
                 if (cippi && zoomAttuale >= 12) t.punti.forEach((p, i) => {
                     if (i < t.punti.length-1) {
                         let s1 = p, s2 = t.punti[i+1];
                         if (isNaN(s1.km) || isNaN(s2.km)) return;
+                        
                         let diffKm = Math.abs(s2.km - s1.km);
-                        if (diffKm > 0) { 
+                        if (diffKm > 0 && diffKm < 10) { 
                             let minK = Math.ceil(Math.min(s1.km, s2.km)), maxK = Math.floor(Math.max(s1.km, s2.km));
                             for (let k = minK; k <= maxK; k++) {
                                 if (k===0 && s1.km===0) continue;
@@ -876,14 +1017,14 @@
                         }
                     }
                 });
-                if (staz) t.punti.forEach(s => { 
-                     if(s.isStazione) L.circleMarker([s.lat, s.lon], { radius: 8, fillColor: "#000", color: "#fff", weight: 2, fillOpacity: 1 }).addTo(mainLayerGroup).bindPopup(`<b>${s.nome}</b><br>Km ${s.km.toFixed(1)}`); 
-                 });
+                if (staz) t.punti.forEach(s => {  
+                    if(s.isStazione) L.circleMarker([s.lat, s.lon], { radius: 8, fillColor: "#000", color: "#fff", weight: 2, fillOpacity: 1 }).addTo(mainLayerGroup).bindPopup(`<b>${s.nome}</b><br>Km ${s.km.toFixed(1)}`);  
+                });
             });
         }
 
         /* =========================================================================
-           8. CORE GESTIONE GEOLOCALIZZAZIONE LIVE E AUTO-SELEZIONE
+           8. CORE GESTIONE GEOLOCALIZZAZIONE LIVE
            ========================================================================= */
         function updateLocation(pos) {
             ultimaPosizioneGps = pos; 
@@ -894,14 +1035,19 @@
                 displayAccuracy.innerHTML = `<span style="color: ${color}; font-weight: bold;">±${accuracy.toFixed(0)} m</span>`;
             }
 
-            if (!userMarker) { 
-                  userMarker = L.circleMarker([latitude, longitude], { color: '#fff', fillColor: '#00F', radius: 11, fillOpacity: 1, weight: 4 }).addTo(map); 
-                  map.setView([latitude, longitude], 13); 
-             } else {
+            // SCRIVIAMO LE COORDINATE REALI NEL BOX (usiamo toFixed(5) per avere 5 decimali, che è molto preciso)
+            if (displayCoords) {
+                displayCoords.innerHTML = `Lat: <b style="color: var(--text-color);">${latitude.toFixed(5)}</b> <br> Lon: <b style="color: var(--text-color);">${longitude.toFixed(5)}</b>`;
+            }
+
+            if (!userMarker) {   
+                userMarker = L.circleMarker([latitude, longitude], { color: '#fff', fillColor: '#00F', radius: 11, fillOpacity: 1, weight: 4 }).addTo(map);   
+                map.setView([latitude, longitude], 13);  
+            } else {
                 userMarker.setLatLng([latitude, longitude]);
                 if (document.getElementById('toggle-autocenter').checked) {
-                    map.setView([latitude, longitude]); 
-                 }
+                    map.setView([latitude, longitude]);  
+                }
             }
 
             if (!autoSelezioneFatta && tratte.length > 0) {
@@ -920,52 +1066,49 @@
 
                 if (idTrattaPiuVicina !== -1 && distMinimaAssoluta < 5) {
                     tratte[idTrattaPiuVicina].attiva = true;
-                    
                     const chk = document.getElementById(`chk-tratta-${idTrattaPiuVicina}`);
                     if (chk) chk.checked = true;
-                    
                     aggiornaVisualizzazione();
                     statusText.innerText = `GPS Acceso. Linea auto-selezionata.`;
                 }
-                
                 autoSelezioneFatta = true; 
             }
-                                    
+            
             let best = null, nStaz = null, dMin = Infinity;
             tratte.forEach(t => {
-                if (!t.attiva) return; 
+                if (!t.attiva) return;
                 
-                t.punti.forEach(s => { 
-                     if (s.isStazione) { 
-                         let d = getDistance(latitude, longitude, s.lat, s.lon); 
-                         if (d < dMin) { dMin = d; nStaz = s; } 
-                     } 
-                 });
+                t.punti.forEach(s => {  
+                    if (s.isStazione) {  
+                        let d = getDistance(latitude, longitude, s.lat, s.lon);  
+                        if (d < dMin) { dMin = d; nStaz = s; }  
+                    }  
+                });
                 for (let i = 0; i < t.punti.length - 1; i++) {
                     let m = getDistanceToSegment(latitude, longitude, t.punti[i].lat, t.punti[i].lon, t.punti[i+1].lat, t.punti[i+1].lon);
                     if (!best || m.dist < best.dist) best = { dist: m.dist, km: (t.punti[i].km + m.t * (t.punti[i+1].km - t.punti[i].km)).toFixed(2), nome: t.nome };
                 }
             });
-                                    
-            if (best && nStaz) { 
-                  if (best.dist > 0.5) {
+            
+            if (best && nStaz) {   
+                if (best.dist > 0.5) {
                     displayStazione.innerHTML = `⚠️ Sede ferroviaria non rilevata`;
                     displayKm.innerHTML = `---`;
                     displayTratta.innerText = `Fuori linea o segnale GPS debole`;
                 } else {
-                    displayStazione.innerHTML = `Stazione: <b>${nStaz.nome}</b> (${dMin.toFixed(1)} km)`; 
-                     displayKm.innerHTML = `Km ${best.km}`; 
-                     displayTratta.innerText = `Linea: ${best.nome}`; 
-                 }
+                    displayStazione.innerHTML = `Stazione più vicina: <b>${nStaz.nome}</b> (${dMin.toFixed(1)} km)`;  
+                    displayKm.innerHTML = `Km ${best.km}`;  
+                    displayTratta.innerText = `Linea: ${best.nome}`;  
+                }
             }
         }
 
-        function forzaPosizione() { 
-             if (ultimaPosizioneGps) {
+        function forzaPosizione() {  
+            if (ultimaPosizioneGps) {
                 map.setView([ultimaPosizioneGps.coords.latitude, ultimaPosizioneGps.coords.longitude]);
             }
-            navigator.geolocation.getCurrentPosition(updateLocation, null, { enableHighAccuracy: true }); 
-         }
+            navigator.geolocation.getCurrentPosition(updateLocation, null, { enableHighAccuracy: true });  
+        }
 
         /* =========================================================================
            9. ESECUZIONE ALL'AVVIO

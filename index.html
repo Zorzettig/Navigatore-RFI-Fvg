@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Progressiva Chilometrica RFI - Live</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <!-- Aggiunta CSS per il pulsante Fullscreen -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.fullscreen@3.0.2/Control.FullScreen.css" />
     <style>
         /* =========================================================================
            1. VARIABILI DI TEMA (CHIARO / SCURO - STILE APPLE)
@@ -176,7 +178,7 @@
         .options-section {
              display: flex;
              flex-direction: column;
-             gap: 4px; /* Ridotto da 12px a 4px per avvicinare le righe */
+             gap: 4px;
              background: var(--info-bg);
              padding: 16px;
              border-radius: 16px;
@@ -201,8 +203,8 @@
              gap: 12px;
              cursor: pointer;
              color: var(--text-color);
-             margin-bottom: 2px; /* Ridotto da 8px a 2px */
-             padding: 2px 0; /* Ridotto il padding verticale da 5px a 2px */
+             margin-bottom: 2px;
+             padding: 2px 0;
         }
 
         .checkbox-container input[type="checkbox"] {
@@ -241,13 +243,13 @@
          }
 
         /* =========================================================================
-           6. DETTAGLI DELLA MAPPA E STATO
+           5. DETTAGLI DELLA MAPPA E STATO
            ========================================================================= */
         .km-icon {
              display: flex;
              justify-content: center;
              align-items: center;
-         }
+         }                 
         
         .km-icon div {
              background-color: rgba(255, 255, 255, 0.95);
@@ -283,24 +285,134 @@
              color: var(--primary-color);
              margin-top: 15px;
              display: inline-block;
-         }
+             text-align: left;
+            width: 100%;
+        }
 
-        /* Modifica: Rimuoviamo la freccia e togliamo il cursore a manina */
-        details summary {
-             outline: none;
-             transition: color 0.3s;
-             font-size: 16px;
-             padding: 10px 0;
-             margin-bottom: 5px;
-             font-weight: bold;
-             cursor: default; /* Non sembra più cliccabile */
-             list-style: none; /* Nasconde la freccia sui browser moderni */
-         }
+        /* =========================================================================
+           11. TASTO ADMIN (INLINEA IN FONDO) E MODALE
+           ========================================================================= */
+        .admin-footer {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid var(--border-color);
+        }
 
-        /* Nasconde la freccia su Safari e Chrome */
-        details summary::-webkit-details-marker {
-             display: none;
-         }
+        .btn-admin-inline {
+            background-color: transparent;
+            border: none;
+            color: var(--note-color);
+            font-size: 26px;
+            cursor: pointer;
+            transition: transform 0.3s ease, filter 0.3s ease;
+            padding: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-admin-inline:active {
+            transform: scale(0.85) rotate(45deg);
+        }
+
+        .modal-overlay {
+            display: none; 
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(4px);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: var(--container-bg);
+            width: 90%;
+            max-width: 600px;
+            max-height: 85vh;
+            border-radius: 20px;
+            padding: 24px;
+            overflow-y: auto;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            position: relative;
+            text-align: left;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: var(--toggle-bg);
+            border: none;
+            border-radius: 50%;
+            width: 32px; height: 32px;
+            cursor: pointer;
+            color: var(--text-color);
+            font-weight: bold;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            background: var(--info-bg);
+            padding: 5px;
+            border-radius: 12px;
+        }
+
+        .modal-tab {
+            flex: 1;
+            padding: 10px 12px;
+            border: none;
+            background: transparent;
+            color: var(--note-color);
+            font-weight: 600;
+            font-size: 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .modal-tab.active {
+            background: var(--container-bg);
+            color: var(--text-color);
+            box-shadow: 0 2px 5px var(--shadow-color);
+        }
+
+        .capisaldi-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 24px;
+            font-size: 14px;
+        }
+
+        .capisaldi-table th, .capisaldi-table td {
+            border-bottom: 1px solid var(--border-color);
+            padding: 10px 8px;
+        }
+
+        .capisaldi-table th {
+            color: var(--primary-color);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 12px;
+        }
+
+        .modal-title {
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 20px;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 10px;
+            display: inline-block;
+        }
     </style>
 </head>
 <body>
@@ -315,16 +427,13 @@
             <div id="km-attuale" class="km-label-main">---</div>
             <div id="tratta-attiva" class="small-note">---</div>
             
-            <!-- ABBIAMO MODIFICATO QUESTA SEZIONE (GPS STATS) -->
             <div class="gps-stats" style="flex-direction: column; gap: 10px;">
                 <div>📡 Precisione: <span id="gps-accuracy">Ricerca...</span></div>
                 
-                <!-- Questo è il nuovo interruttore stile iOS -->
                 <label class="checkbox-container" style="font-size: 13px; margin-bottom: 0;">
                     <input type="checkbox" id="toggle-coords" onchange="toggleCordinate()"> Mostra coordinate GPS
                 </label>
                 
-                <!-- Questo è il box che contiene le coordinate. È nascosto all'inizio (display: none) -->
                 <div id="gps-coords-display" style="display: none; font-size: 13px; font-family: monospace; color: var(--note-color); background: var(--panel-bg); padding: 10px; border-radius: 8px; border: 1px solid var(--border-color);">
                     Lat: --- <br> Lon: ---
                 </div>
@@ -354,11 +463,36 @@
             <button class="btn-gps btn-clear-cache" onclick="svuotaCacheRFI()">🔄 Riscarica dati RFI (Svuota Cache)</button>
         </div>
 
-        <div id="status" class="small-note">Inizializzazione...</div>
+        <!-- Sezione in fondo per lo stato e il pulsante Admin -->
+        <div class="admin-footer">
+            <div id="status" class="small-note" style="flex-grow: 1;">Inizializzazione...</div>
+            <button class="btn-admin-inline" onclick="richiediCodiceAdmin()" title="Area Tecnica">⚙️</button>
+        </div>
     </div>
 
-    <!-- Caricamento libreria Leaflet per le mappe -->
+    <!-- Modale Capisaldi e GPS -->
+    <div id="admin-modal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="close-btn" onclick="chiudiAdmin()">✕</button>
+            <h2 class="modal-title">🛠️ Dati di Calibrazione</h2>
+            
+            <div class="modal-tabs">
+                <button class="modal-tab active" id="btn-tab-km" onclick="switchTabAdmin('km')">Capisaldi (Km)</button>
+                <button class="modal-tab" id="btn-tab-gps" onclick="switchTabAdmin('gps')">Coordinate (GPS)</button>
+            </div>
+
+            <!-- Contenitore Tabelle KM -->
+            <div id="tab-km"></div>
+            
+            <!-- Contenitore Tabelle GPS -->
+            <div id="tab-gps" style="display: none;"></div>
+            
+        </div>
+    </div>
+
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <!-- Aggiunta Script per il pulsante Fullscreen -->
+    <script src="https://unpkg.com/leaflet.fullscreen@3.0.2/Control.FullScreen.js"></script>
     <script>
         /* =========================================================================
            1. COSTANTI DI CONFIGURAZIONE E STRUTTURE DATI
@@ -370,29 +504,33 @@
         const nomeSuper5 = "CASARSA - PORTOGRUARO";
         const nomeSuper6 = "BIVIO SAN POLO - MESTRE";
         const nomeSuper7 = "TRIESTE CENTRALE - BIVIO S.POLO"; 
-        const nomeSuper8 = "UDINE - CERVIGNANO A.G.";
+        
+        // MODIFICA CRITICA: Dividiamo logicamente la linea in due per i calcoli dei KM.
+        const nomeSuper8a = "UDINE - PALMANOVA (Tratta 1)";
+        const nomeSuper8b = "PALMANOVA - CERVIGNANO (Tratta 2)";
+        
         const nomeSuper9 = "VENEZIA MESTRE - VENEZIA S.LUCIA";
 
-        // LISTA BIANCA: SOLO LE TRATTE AMMESSE
         const TRATTE_AMMESSE = [
             nomeSuper1, nomeSuper2, nomeSuper3, nomeSuper4, 
-            nomeSuper5, nomeSuper6, nomeSuper7, nomeSuper8, 
+            nomeSuper5, nomeSuper6, nomeSuper7, nomeSuper8a, nomeSuper8b, 
             nomeSuper9, "P.M. VAT - UDINE PARCO"
         ];
 
-        // TAVOLOZZA COLORI FISSI E DISTINTI
         const COLORI_FISSI = {
-            [nomeSuper2]: "#E3000F", // Rosso acceso (UDINE - VENEZIA MESTRE)
-            [nomeSuper1]: "#0055A4", // Blu forte (UDINE - BIVIO S.POLO)
-            [nomeSuper3]: "#008A00", // Verde scuro (UDINE - TARVISIO)
-            [nomeSuper5]: "#800080", // Viola (CASARSA - PORTOGRUARO)
-            [nomeSuper4]: "#FF8C00", // Arancione (SACILE - MANIAGO)
-            [nomeSuper6]: "#00CED1", // Azzurro/Ciano (BIVIO SAN POLO - MESTRE)
-            [nomeSuper7]: "#E0007A", // Fucsia/Magenta (TRIESTE C.LE - BIVIO S.POLO)
-            [nomeSuper8]: "#8B4513", // Marrone (UDINE - CERVIGNANO)
-            [nomeSuper9]: "#32CD32", // Verde chiaro (MESTRE - S.LUCIA)
-            "P.M. VAT - UDINE PARCO": "#000080" // Blu Notte
+            [nomeSuper2]: "#E3000F", 
+            [nomeSuper1]: "#0055A4", 
+            [nomeSuper3]: "#008A00", 
+            [nomeSuper5]: "#800080", 
+            [nomeSuper4]: "#FF8C00", 
+            [nomeSuper6]: "#00CED1", 
+            [nomeSuper7]: "#E0007A", 
+            [nomeSuper8a]: "#8B4513", // Entrambe le tratte hanno lo stesso colore marrone
+            [nomeSuper8b]: "#8B4513", 
+            [nomeSuper9]: "#32CD32", 
+            "P.M. VAT - UDINE PARCO": "#000080"
         };
+        
         const PALETTE_EXTRA = ["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd", "#8c564b", "#e377c2", "#7f7f7f", "#bcbd22", "#17becf"];
         let colorIndex = 0;
 
@@ -404,21 +542,81 @@
             { nuovoNome: nomeSuper5, segmenti: ["CASARSA - S.VITO AL TAGLIAMENTO", "S.VITO AL TAGLIAMENTO - CORDOVADO SESTO", "CORDOVADO SESTO - PORTOGRUARO"] },
             { nuovoNome: nomeSuper6, segmenti: ["MONF.DEV.S.POLO - RONCHI DEI LEGIONARI SUD", "RONCHI DEI LEGIONARI SUD - CERVIGNANO A.G.", "CERVIGNANO A.G. - TORVISCOSA", "TORVISCOSA - S.GIORGIO DI NOGARO", "S.GIORGIO DI NOGARO - LATISANA", "LATISANA - PORTOGRUARO", "PORTOGRUARO - S.STINO DI LIVENZA", "S.STINO DI LIVENZA - S.DONA' DI PIAVE JESOLO", "S.DONA' DI PIAVE JESOLO - QUARTO D'ALTINO", "QUARTO D'ALTINO - VENEZIA CARPENEDO", "VENEZIA CARPENEDO - CONFLUENZA UD-TS", "CONFLUENZA UD-TS - VENEZIA MESTRE (VIA TS)"] },
             { nuovoNome: nomeSuper7, segmenti: ["TRIESTE CENTRALE - TRIESTE C.LE GR SC. GRETTA", "TRIESTE C.LE GR SC. GRETTA - TRIESTE C.LE GR SC. BARCOLA", "TRIESTE C.LE GR SC. BARCOLA - BIVIO D'AURISINA SC. ESTR. GALLERIA", "BIVIO D'AURISINA SC. ESTR. GALLERIA - BIVIO D'AURISINA", "BIVIO D'AURISINA - MONFALCONE", "MONFALCONE - MONF.DEV.S.POLO"] },
-            { nuovoNome: nomeSuper8, segmenti: ["UDINE - BIVIO CARGNACCO", "BIVIO CARGNACCO - DEV. BIVIO CARGNACCO (UD)", "DEV. BIVIO CARGNACCO - RISANO", "RISANO - PALMANOVA", "PALMANOVA - DEV.E. LATO UDINE", "DEV.E. LATO UDINE - CERVIGNANO SMISTAMENTO F.P.", "CERVIGNANO SMISTAMENTO F.P. - DEV.RACCORDO ARRIVI", "DEV.RACCORDO ARRIVI - CERVIGNANO A.G."] },
+            
+            // MODIFICA CRITICA: Divisione dei segmenti geometrici
+            { nuovoNome: nomeSuper8a, segmenti: ["UDINE - BIVIO CARGNACCO", "BIVIO CARGNACCO - DEV. BIVIO CARGNACCO (UD)", "DEV. BIVIO CARGNACCO - RISANO", "RISANO - PALMANOVA"] },
+            { nuovoNome: nomeSuper8b, segmenti: ["PALMANOVA - DEV.E. LATO UDINE", "DEV.E. LATO UDINE - CERVIGNANO SMISTAMENTO F.P.", "CERVIGNANO SMISTAMENTO F.P. - DEV.RACCORDO ARRIVI", "DEV.RACCORDO ARRIVI - CERVIGNANO A.G."] },
+            
             { nuovoNome: nomeSuper9, segmenti: ["VENEZIA MESTRE - DEV.ESTR.VENEZIA (ponte nuovo)", "DEV.ESTR.VENEZIA - VENEZIA S.LUCIA (ponte vecchio)"] }
         ];
 
-        // CALIBRAZIONI LINEE
+        // MODIFICA CRITICA: Inserimento nuovi chilometri e correzione Cervignano a 10.401
+        const kmRealiUdinePalmanova = { "UDINE": 0.0, "RISANO": 9.883, "PALMANOVA": 17.940 };
+        const kmRealiPalmanovaCervignano = { "PALMANOVA": 0.0, "CERVIGNANO": 10.401 };
+
         const kmRealiSanPoloMestre = { "VENEZIA MESTRE": 0.0, "OLIMPIA": 1.9, "CARPENEDO": 3.9, "GAGGIO": 10.7, "QUARTO D'ALTINO": 15.7, "MEOLO": 23.9, "FOSSALTA DI PIAVE": 27.7, "S.DONA": 32.7, "CEGGIA": 40.6, "S.STINO": 45.9, "LISON": 52.8, "PORTOGRUARO": 59.3, "LATISANA": 73.2, "S.GIORGIO": 90.6, "TORVISCOSA": 96.6, "CERVIGNANO": 101.3, "TRIESTE AIRPORT": 112.8, "RONCHI": 114.0 };
+        
+        const capisaldiGpsSanPoloMestre = [
+            { km: 91.829, lat: 45.828970, lon: 13.221518 },
+            { km: 92.224, lat: 45.828551, lon: 13.226542 },
+            { km: 92.643, lat: 45.827406, lon: 13.231675 },
+            { km: 103.069, lat: 45.819319, lon: 13.364175 },
+            { km: 114.256, lat: 45.818401, lon: 13.503552 }
+        ];
+
         const capisaldiGpsUdineBivioSPolo = [ { km: 2.9, lat: 46.043658, lon: 13.272406 }, { km: 30, lat: 45.938751, lon: 13.572469 }, { km: 47.6, lat: 45.858269, lon: 13.484634 }, { km: 48.95, lat: 45.847216, lon: 13.489232 }, { km: 51.1, lat: 45.831259, lon: 13.504973 }, { km: 52.2, lat: 45.822599, lon: 13.513489 } ];
+        
+        const kmRealiUdineBivioSPolo = { "UDINE": 0.0, "BUTTRIO": 8.67, "MANZANO": 13.14, "S.GIOVANNI": 15.33, "CORMONS": 20.78, "GORIZIA": 32.86, "SAGRADO": 46.00, "REDIPUGLIA": 48.19, "RONCHI": 51.23 };
         const kmRealiUdineMestre = { "UDINE": 126.57, "BASILIANO": 115.2, "CODROIPO": 103.6, "CASARSA": 92.9, "CUSANO": 86.4, "PORDENONE": 77.8, "FONTANAFREDDA": 71.3, "SACILE": 64.9, "ORSAGO": 59.4, "PIANZANO": 55.4, "CONEGLIANO": 47.8, "SUSEGANA": 40.0, "SPRESIANO": 34.7, "LANCENIGO": 27.2, "TREVISO CENTRALE": 20.9, "SAN TROVASO": 16.3, "PREGANZIOL": 13.9, "MOGLIANO VENETO": 9.2, "OSPEDALE": 3.9, "GAZZERA": 1.2, "VENEZIA MESTRE": 0.0 };
+        
         const capisaldiGpsUdineMestre = [ { km: 1, lat: 45.488092, lon: 12.222952 }, { km: 4, lat: 45.514736, lon: 12.226043 }, { km: 5, lat: 45.523635, lon: 12.227747 }, { km: 6, lat: 45.532502, lon: 12.229466 }, { km: 8, lat: 45.550450, lon: 12.232614 }, { km: 9, lat: 45.559444, lon: 12.232772 }, { km: 10, lat: 45.568426, lon: 12.232380 }, { km: 14, lat: 45.604362, lon: 12.231518 }, { km: 16, lat: 45.622234, lon: 12.232779 }, { km: 17, lat: 45.631263, lon: 12.232588 }, { km: 19, lat: 45.649205, lon: 12.232154 }, { km: 20, lat: 45.657771, lon: 12.234304 }, { km: 21, lat: 45.659592, lon: 12.246388 }, { km: 23, lat: 45.672559, lon: 12.259240 }, { km: 25, lat: 45.690633, lon: 12.262503 }, { km: 27, lat: 45.708186, lon: 12.265405 }, { km: 29, lat: 45.726534, lon: 12.267608 }, { km: 33, lat: 45.762196, lon: 12.267827 }, { km: 35, lat: 45.779674, lon: 12.265230 }, { km: 37, lat: 45.795752, lon: 12.254676 }, { km: 38, lat: 45.804635, lon: 12.251723 }, { km: 39, lat: 45.813155, lon: 12.251198 }, { km: 40, lat: 45.820622, lon: 12.258001 }, { km: 41, lat: 45.828916, lon: 12.263692 }, { km: 43, lat: 45.845420, lon: 12.273212 }, { km: 45, lat: 45.862304, lon: 12.283018 }, { km: 47, lat: 45.879249, lon: 12.291827 }, { km: 48, lat: 45.885287, lon: 12.300507 }, { km: 49, lat: 45.889654, lon: 12.311860 }, { km: 50, lat: 45.894103, lon: 12.323346 }, { km: 53, lat: 45.904810, lon: 12.358450 }, { km: 55, lat: 45.911704, lon: 12.382343 }, { km: 57, lat: 45.918573, lon: 12.406137 }, { km: 60, lat: 45.930688, lon: 12.440696 }, { km: 65, lat: 45.948531, lon: 12.498970 }, { km: 72, lat: 45.968678, lon: 12.583043 }, { km: 73, lat: 45.968050, lon: 12.595957 }, { km: 74, lat: 45.967404, lon: 12.608984 }, { km: 75, lat: 45.965754, lon: 12.622196 }, { km: 77, lat: 45.960610, lon: 12.646295 }, { km: 78, lat: 45.954923, lon: 12.655463 }, { km: 80, lat: 45.947060, lon: 12.676631 }, { km: 83, lat: 45.941725, lon: 12.713792 }, { km: 84, lat: 45.942813, lon: 12.726719 }, { km: 86, lat: 45.944980, lon: 12.752178 }, { km: 88, lat: 45.947163, lon: 12.777969 }, { km: 93, lat: 45.953200, lon: 12.841473 }, { km: 94, lat: 45.955964, lon: 12.854021 }, { km: 95, lat: 45.958618, lon: 12.865924 }, { km: 96, lat: 45.959513, lon: 12.879297 }, { km: 104, lat: 45.967025, lon: 12.980304 }, { km: 105, lat: 45.971165, lon: 12.991998 }, { km: 115, lat: 46.011938, lon: 13.107003 }, { km: 126, lat: 46.053864, lon: 13.235291 } ];
+        
         const kmRealiPortoCasarsa = { "PORTOGRUARO": 0.0, "TEGLIO VENETO": 3.9, "CORDOVADO SESTO": 8.6, "S.VITO": 15.9, "SAN VITO": 15.9, "VITO AL TAGLIAMENTO": 15.9, "S.GIOVANNI": 19.4, "SAN GIOVANNI": 19.4, "GIOVANNI DI CASARSA": 19.4, "CASARSA": 21.1 };
+        
         const kmRealiSacileManiago = { "SACILE": 0.0, "LIBERALE": 2.0, "BUDOIA": 10.4, "AVIANO": 16.1, "MONTEREALE": 27.2, "MANIAGO": 32.2 };
+        
+        // Dintlha tše mpsha tša GPS tša SACILE - MANIAGO
+        const capisaldiGpsSacileManiago = [
+            { km: 0.109, lat: 45.948694, lon: 12.499869 },
+            { km: 1.030, lat: 45.951022, lon: 12.511178 },
+            { km: 1.797, lat: 45.957318, lon: 12.514461 },
+            { km: 2.237, lat: 45.961217, lon: 12.515192 },
+            { km: 2.885, lat: 45.967063, lon: 12.516286 },
+            { km: 3.764, lat: 45.974838, lon: 12.517745 },
+            { km: 5.351, lat: 45.988944, lon: 12.520382 },
+            { km: 6.130, lat: 45.995963, lon: 12.521699 },
+            { km: 7.303, lat: 46.006342, lon: 12.524236 },
+            { km: 8.394, lat: 46.015684, lon: 12.528568 },
+            { km: 10.971, lat: 46.033656, lon: 12.544060 },
+            { km: 11.385, lat: 46.035886, lon: 12.548321 },
+            { km: 12.771, lat: 46.042299, lon: 12.563057 },
+            { km: 13.661, lat: 46.049565, lon: 12.567295 },
+            { km: 14.295, lat: 46.053130, lon: 12.573686 },
+            { km: 15.174, lat: 46.058372, lon: 12.582178 },
+            { km: 15.602, lat: 46.061105, lon: 12.586069 },
+            { km: 16.479, lat: 46.066729, lon: 12.594048 },
+            { km: 16.817, lat: 46.068876, lon: 12.597141 },
+            { km: 17.613, lat: 46.075545, lon: 12.599545 },
+            { km: 21.696, lat: 46.106393, lon: 12.623746 },
+            { km: 26.824, lat: 46.146379, lon: 12.654245 },
+            { km: 30.669, lat: 46.161823, lon: 12.698827 },
+            { km: 31.346, lat: 46.164535, lon: 12.706671 }
+        ];
+
         const kmRealiMestreSantaLucia = { "VENEZIA MESTRE": 257.90, "PORTO MARGHERA": 260.19, "S.LUCIA": 266.34 };
+        
         const capisaldiGpsMestreSantaLucia = [ { km: 259, lat: 45.479134, lon: 12.244667 }, { km: 260, lat: 45.473811, lon: 12.254119 } ];
         
-        // CAPISALDI CASARSA PORTOGRUARO AGGIORNATI CON IL KM 15.99
+        const kmRealiUdineTarvisio = { "UDINE": 0.0, "VAT": 4.493, "TRICESIMO": 11.975, "TARCENTO": 18.349, "ARTEGNA": 22.147, "GEMONA": 28.199, "VENZONE": 34.895, "CARNIA": 39.669, "PONTEBBA": 62.576, "UGOVIZZA": 79.249, "TARVISIO": 88.790 };
+
+        const capisaldiGpsUdineTarvisio = [
+            { km: 0.877, lat: 46.060347, lon: 13.250451 },
+            { km: 1.228, lat: 46.063490, lon: 13.250247 },
+            { km: 1.545, lat: 46.066329, lon: 13.249812 },
+            { km: 1.931, lat: 46.069787, lon: 13.249284 },
+            { km: 2.784, lat: 46.077432, lon: 13.248533 }
+        ];
+
         const capisaldiGpsCasarsaPortogruaro = [
             { km: 1, lat: 45.786690, lon: 12.841830 },
             { km: 5, lat: 45.818891, lon: 12.864544 },
@@ -446,32 +644,48 @@
             { km: 20.10, lat: 45.947145, lon: 12.833013 }
         ];
 
-        /* =========================================================================
-           2. COLLEGAMENTI DOM & VARIABILI GLOBALI
-           ========================================================================= */
+        // NUOVI ARRAY GPS: UDINE - CERVIGNANO
+        const capisaldiGpsUdinePalmanova = [
+            { km: 1.312, lat: 46.049154, lon: 13.230233 },
+            { km: 2.043, lat: 46.042545, lon: 13.232947 },
+            { km: 6.917, lat: 46.000420, lon: 13.250343 },
+            { km: 7.415, lat: 45.996170, lon: 13.252086 },
+            { km: 7.969, lat: 45.991211, lon: 13.254121 },
+            { km: 10.290, lat: 45.971503, lon: 13.263925 },
+            { km: 11.359, lat: 45.962681, lon: 13.269401 },
+            { km: 12.440, lat: 45.953757, lon: 13.274941 },
+            { km: 14.493, lat: 45.936771, lon: 13.285482 },
+            { km: 14.954, lat: 45.932982, lon: 13.287819 },
+            { km: 16.525, lat: 45.922562, lon: 13.292227 }
+        ];
+
+        const capisaldiGpsPalmanovaCervignano = [
+            { km: 0.769, lat: 45.900110, lon: 13.298720 },
+            { km: 1.244, lat: 45.896091, lon: 13.300826 },
+            { km: 2.283, lat: 45.887181, lon: 13.304807 },
+            { km: 3.295, lat: 45.878318, lon: 13.307825 }
+        ];
+
         const displayStazione = document.getElementById('stazione-vicina');
         const displayKm = document.getElementById('km-attuale');
         const displayTratta = document.getElementById('tratta-attiva');
         const displayAccuracy = document.getElementById('gps-accuracy');
         const statusText = document.getElementById('status');
         const containerTratte = document.getElementById('toggles-tratte');
-        const displayCoords = document.getElementById('gps-coords-display'); // <- NUOVO COLLEGAMENTO DOM
-
+        const displayCoords = document.getElementById('gps-coords-display');
+        
         let map, userMarker, ultimaPosizioneGps = null;
         let osmLayer, railwayLayer;
         let mainLayerGroup = L.featureGroup();
         let tratte = []; 
         let autoSelezioneFatta = false; 
 
-        /* =========================================================================
-           3. FUNZIONI UTILITY GENERALI
-           ========================================================================= */
         function toggleTema() {
             document.body.classList.toggle('dark-mode');
             const btn = document.querySelector('.theme-btn');
             btn.innerText = document.body.classList.contains('dark-mode') ? '☀️' : '🌙';
         }
-
+        
         function getDistance(lat1, lon1, lat2, lon2) {
             const R = 6371; 
             const dLat = (lat2 - lat1) * Math.PI / 180;
@@ -479,7 +693,7 @@
             const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon/2) * Math.sin(dLon/2);
             return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
         }
-
+        
         function getDistanceToSegment(lat, lon, lat1, lon1, lat2, lon2) {
             const l2 = Math.pow(lat2 - lat1, 2) + Math.pow(lon2 - lon1, 2);
             if (l2 === 0) return { dist: getDistance(lat, lon, lat1, lon1), t: 0 };
@@ -487,23 +701,20 @@
             t = Math.max(0, Math.min(1, t)); 
             return { dist: getDistance(lat, lon, lat1 + t * (lat2 - lat1), lon1 + t * (lon2 - lon1)), t: t };
         }
-
+        
         function svuotaCacheRFI() {
-            localStorage.removeItem('rfi_stazioni_v1');
-            localStorage.removeItem('rfi_tratte_v1');
+            localStorage.removeItem('rfi_stazioni_v2');
+            localStorage.removeItem('rfi_tratte_v2');
             location.reload(); 
         }
 
-        /* =========================================================================
-           4. FUNZIONI DI CALIBRAZIONE GEOMETRICA
-           ========================================================================= */
         function applicaCalibrazioneStazioni(tratta, dizionarioReali, stazioniReference = null) {
             let ancore = [];
-            Object.keys(dizionarioReali).forEach(chiaveForzata => {
-                let kmRealeForzato = dizionarioReali[chiaveForzata];
-                let bestIdx = -1;
-                
-                if (stazioniReference) {
+            
+            if (stazioniReference) {
+                Object.keys(dizionarioReali).forEach(chiaveForzata => {
+                    let kmRealeForzato = dizionarioReali[chiaveForzata];
+                    let bestIdx = -1;
                     let stazioneRFI = stazioniReference.find(st => st.nome.toUpperCase().includes(chiaveForzata) && !(chiaveForzata === "VENEZIA MESTRE" && st.nome.toUpperCase().includes("OLIMPIA")));
                     if (stazioneRFI) {
                         let minDist = Infinity;
@@ -514,107 +725,100 @@
                             }
                         });
                     }
-                } else {
-                    tratta.punti.forEach((punto, index) => {
-                        if (punto.isStazione && !punto.nome.toUpperCase().includes("D.E.") && punto.nome.toUpperCase().includes(chiaveForzata)) bestIdx = index;
-                    });
-                }
-                if (bestIdx !== -1) ancore.push({ indice: bestIdx, kmCalcolato: tratta.punti[bestIdx].km, kmReale: kmRealeForzato });
-            });
-            ricalcolaSuAncore(tratta, ancore);
-        }
-
-        function applicaCalibrazioneGps(tratta, capisaldiGps, kmUltimo) {
-            let ancore = [{ indice: tratta.punti.length - 1, kmCalcolato: tratta.punti[tratta.punti.length - 1].km, kmReale: kmUltimo }];
-            capisaldiGps.forEach(caposaldo => {
-                let bestIdx = -1; let minDist = Infinity;
-                tratta.punti.forEach((punto, index) => {
-                    let d = getDistance(caposaldo.lat, caposaldo.lon, punto.lat, punto.lon);
-                    if (d < minDist) { minDist = d; bestIdx = index; }
+                    if (bestIdx !== -1) ancore.push({ indice: bestIdx, kmCalcolato: tratta.punti[bestIdx].km, kmReale: kmRealeForzato });
                 });
-                if (bestIdx !== -1 && minDist < 0.15) {
-                    ancore = ancore.filter(a => a.indice !== bestIdx);
-                    ancore.push({ indice: bestIdx, kmCalcolato: tratta.punti[bestIdx].km, kmReale: caposaldo.km });
-                }
-            });
-            ricalcolaSuAncore(tratta, ancore);
-        }
-
-        function applicaCalibrazioneStazioniEGps(tratta, dizionarioReali, capisaldiGps) {
-            let ancore = [];
-            tratta.punti.forEach((punto, index) => {
-                if (punto.isStazione && !punto.nome.toUpperCase().includes("D.E.")) {
-                    let chiaveTrovata = Object.keys(dizionarioReali).find(k => punto.nome.toUpperCase().includes(k));
-                    if (chiaveTrovata) ancore.push({ indice: index, kmCalcolato: punto.km, kmReale: dizionarioReali[chiaveTrovata] });
-                }
-            });
-            capisaldiGps.forEach(caposaldo => {
-                let bestIdx = -1; let minDist = Infinity;
+            } else {
                 tratta.punti.forEach((punto, index) => {
-                    let d = getDistance(caposaldo.lat, caposaldo.lon, punto.lat, punto.lon);
-                    if (d < minDist) { minDist = d; bestIdx = index; }
-                });
-                if (bestIdx !== -1 && minDist < 0.15) {
-                    ancore = ancore.filter(a => a.indice !== bestIdx);
-                    ancore.push({ indice: bestIdx, kmCalcolato: tratta.punti[bestIdx].km, kmReale: caposaldo.km });
-                }
-            });
-            ricalcolaSuAncore(tratta, ancore);
-        }
-
-        function applicaCalibrazioneTrieste(tratta) {
-            const originalKms = tratta.punti.map(p => p.km); 
-
-            const capisaldi = [
-                { nome: "TRIESTE CENTRALE", kmReale: 0.0, cercaStazione: true },
-                { nome: "MIRAMARE", kmReale: 7.033, cercaStazione: true },
-                { nome: "GALLERIA_CRESCENTE", kmReale: 13.687, cercaStazione: false, targetGeomKm: 13.687 }, 
-                { nome: "GALLERIA_DECRESCENTE", kmReale: 131.31, cercaStazione: false, offsetDalPrecedente: 1 }, 
-                { nome: "BIVIO D'AURISINA", kmReale: 130.463, cercaStazione: true },
-                { nome: "SISTIANA", kmReale: 127.730, cercaStazione: true },
-                { nome: "MONFALCONE", kmReale: 117.746, cercaStazione: true },
-                { nome: "S.POLO", kmReale: 116.266, cercaStazione: false, targetLastPoint: true }
-            ];
-
-            let ancore = [];
-            let lastGalleriaIdx = -1;
-
-            capisaldi.forEach(caposaldo => {
-                let bestIdx = -1;
-                
-                if (caposaldo.cercaStazione) {
-                    tratta.punti.forEach((punto, index) => {
-                        if (punto.isStazione && punto.nome.toUpperCase().includes(caposaldo.nome)) {
-                            bestIdx = index;
-                        }
-                    });
-                } else if (caposaldo.targetGeomKm !== undefined) {
-                    let minDiff = Infinity;
-                    originalKms.forEach((geomKm, index) => {
-                        let diff = Math.abs(geomKm - caposaldo.targetGeomKm);
-                        if (diff < minDiff) {
-                            minDiff = diff;
-                            bestIdx = index;
-                        }
-                    });
-                    lastGalleriaIdx = bestIdx;
-                } else if (caposaldo.offsetDalPrecedente !== undefined) {
-                    if (lastGalleriaIdx !== -1 && lastGalleriaIdx + 1 < tratta.punti.length) {
-                        bestIdx = lastGalleriaIdx + 1;
+                    if (punto.isStazione && !punto.nome.toUpperCase().includes("D.E.")) {
+                        let chiaveTrovata = Object.keys(dizionarioReali).find(k => punto.nome.toUpperCase().includes(k));
+                        if (chiaveTrovata) ancore.push({ indice: index, kmCalcolato: punto.km, kmReale: dizionarioReali[chiaveTrovata] });
                     }
-                } else if (caposaldo.targetLastPoint) {
-                    bestIdx = tratta.punti.length - 1;
-                }
-                
-                if (bestIdx !== -1 && bestIdx < tratta.punti.length) {
-                    ancore.push({ 
-                        indice: bestIdx, 
-                        kmCalcolato: originalKms[bestIdx], 
-                        kmReale: caposaldo.kmReale, 
-                        nome: caposaldo.nome 
-                    });
+                });
+            }
+            ricalcolaSuAncore(tratta, ancore);
+        }
+
+        function applicaCalibrazioneStazioniEGps(tratta, dizionarioReali, capisaldiGps, stazioniReference = null) {
+            let ancore = [];
+            
+            if (stazioniReference) {
+                Object.keys(dizionarioReali).forEach(chiaveForzata => {
+                    let kmRealeForzato = dizionarioReali[chiaveForzata];
+                    let bestIdx = -1;
+                    let stazioneRFI = stazioniReference.find(st => st.nome.toUpperCase().includes(chiaveForzata) && !(chiaveForzata === "VENEZIA MESTRE" && st.nome.toUpperCase().includes("OLIMPIA")));
+                    if (stazioneRFI) {
+                        let minDist = Infinity;
+                        tratta.punti.forEach((punto, index) => {
+                            if (punto.isStazione && punto.nome.toUpperCase().includes(stazioneRFI.nome.toUpperCase())) {
+                                let d = getDistance(stazioneRFI.lat, stazioneRFI.lon, punto.lat, punto.lon);
+                                if (d < minDist) { minDist = d; bestIdx = index; }
+                            }
+                        });
+                    }
+                    if (bestIdx !== -1) ancore.push({ indice: bestIdx, kmCalcolato: tratta.punti[bestIdx].km, kmReale: kmRealeForzato });
+                });
+            } else {
+                tratta.punti.forEach((punto, index) => {
+                    if (punto.isStazione && !punto.nome.toUpperCase().includes("D.E.")) {
+                        let chiaveTrovata = Object.keys(dizionarioReali).find(k => punto.nome.toUpperCase().includes(k));
+                        if (chiaveTrovata) ancore.push({ indice: index, kmCalcolato: punto.km, kmReale: dizionarioReali[chiaveTrovata] });
+                    }
+                });
+            }
+
+            capisaldiGps.forEach(caposaldo => {
+                let bestIdx = -1; let minDist = Infinity;
+                tratta.punti.forEach((punto, index) => {
+                    let d = getDistance(caposaldo.lat, caposaldo.lon, punto.lat, punto.lon);
+                    if (d < minDist) { minDist = d; bestIdx = index; }
+                });
+                if (bestIdx !== -1 && minDist < 0.15) {
+                    ancore = ancore.filter(a => a.indice !== bestIdx);
+                    ancore.push({ indice: bestIdx, kmCalcolato: tratta.punti[bestIdx].km, kmReale: caposaldo.km });
                 }
             });
+            ricalcolaSuAncore(tratta, ancore);
+        }
+        
+        function applicaCalibrazioneTrieste(tratta) {
+            let idxTrieste = -1, idxMiramare = -1, idxBivio = -1, idxSistiana = -1, idxMonfalcone = -1;
+            
+            tratta.punti.forEach((punto, index) => {
+                if (punto.isStazione) {
+                    if (punto.nome.toUpperCase().includes("TRIESTE CENTRALE")) idxTrieste = index;
+                    if (punto.nome.toUpperCase().includes("MIRAMARE")) idxMiramare = index;
+                    if (punto.nome.toUpperCase().includes("AURISINA")) idxBivio = index;
+                    if (punto.nome.toUpperCase().includes("SISTIANA")) idxSistiana = index;
+                    if (punto.nome.toUpperCase().includes("MONFALCONE")) idxMonfalcone = index;
+                }
+            });
+
+            // Se Bivio d'Aurisina non viene agganciato, cerchiamo il punto geometrico a ~13.7 km
+            if (idxBivio === -1) {
+                let minDiff = Infinity;
+                tratta.punti.forEach((p, i) => {
+                    let diff = Math.abs(p.km - 13.7);
+                    if (diff < minDiff) { minDiff = diff; idxBivio = i; }
+                });
+            }
+
+            let ancore = [];
+            if (idxTrieste !== -1) ancore.push({ indice: idxTrieste, kmCalcolato: tratta.punti[idxTrieste].km, kmReale: 0.0 });
+            if (idxMiramare !== -1) ancore.push({ indice: idxMiramare, kmCalcolato: tratta.punti[idxMiramare].km, kmReale: 7.033 });
+            
+            if (idxBivio !== -1) {
+                // Gestione del "salto" chilometrico: il punto prima del Bivio mantiene i km da Trieste
+                if (idxBivio > 0) {
+                    ancore.push({ indice: idxBivio - 1, kmCalcolato: tratta.punti[idxBivio - 1].km, kmReale: 13.687 });
+                }
+                ancore.push({ indice: idxBivio, kmCalcolato: tratta.punti[idxBivio].km, kmReale: 130.463 });
+            }
+            
+            if (idxSistiana !== -1) ancore.push({ indice: idxSistiana, kmCalcolato: tratta.punti[idxSistiana].km, kmReale: 127.730 });
+            if (idxMonfalcone !== -1) ancore.push({ indice: idxMonfalcone, kmCalcolato: tratta.punti[idxMonfalcone].km, kmReale: 117.746 });
+            
+            // L'ultimo punto forzato a Bivio San Polo
+            ancore.push({ indice: tratta.punti.length - 1, kmCalcolato: tratta.punti[tratta.punti.length - 1].km, kmReale: 116.266 });
 
             ricalcolaSuAncore(tratta, ancore);
         }
@@ -647,22 +851,19 @@
                 });
             }
         }
-
-        /* =========================================================================
-           5. ELABORAZIONE PRINCIPALE DATI API RFI
-           ========================================================================= */
+        
         async function scaricaDatiRFI() {
             statusText.innerText = "Verifica dati in memoria...";
             const bbox_nordest = "10.5,44.8,14.0,46.7"; 
             const urlTratte = `https://services3.arcgis.com/GS5pg5GvYXCMCEen/arcgis/rest/services/SHAPE_TRATTE/FeatureServer/0/query?f=geojson&outSR=4326&outFields=*&geometry=${bbox_nordest}&geometryType=esriGeometryEnvelope&inSR=4326&spatialRel=esriSpatialRelIntersects`;
             const urlStazioni = `https://services3.arcgis.com/GS5pg5GvYXCMCEen/arcgis/rest/services/SHAPE_LOCALITA/FeatureServer/0/query?f=geojson&outSR=4326&outFields=*&geometry=${bbox_nordest}&geometryType=esriGeometryEnvelope&inSR=4326&spatialRel=esriSpatialRelIntersects`;
-
+            
             let dataStazioni, dataTratte;
-
+            
             try {
-                const cachedStazioni = localStorage.getItem('rfi_stazioni_v1');
-                const cachedTratte = localStorage.getItem('rfi_tratte_v1');
-
+                const cachedStazioni = localStorage.getItem('rfi_stazioni_v2');
+                const cachedTratte = localStorage.getItem('rfi_tratte_v2');
+                
                 if (cachedStazioni && cachedTratte) {
                     statusText.innerText = "Caricamento dati offline rapido...";
                     dataStazioni = JSON.parse(cachedStazioni);
@@ -671,14 +872,14 @@
                     statusText.innerText = "Connessione ai server RFI in corso...";
                     const resStazioni = await fetch(urlStazioni);
                     dataStazioni = await resStazioni.json();
-                                        
+                    
                     const resTratte = await fetch(urlTratte);
                     dataTratte = await resTratte.json();
-
-                    localStorage.setItem('rfi_stazioni_v1', JSON.stringify(dataStazioni));
-                    localStorage.setItem('rfi_tratte_v1', JSON.stringify(dataTratte));
+                    
+                    localStorage.setItem('rfi_stazioni_v2', JSON.stringify(dataStazioni));
+                    localStorage.setItem('rfi_tratte_v2', JSON.stringify(dataTratte));
                 }
-
+                
                 let stazioniRFI = dataStazioni.features.map(f => ({
                     nome: f.properties.NOME, lat: f.geometry.coordinates[1], lon: f.geometry.coordinates[0], 
                     regione: f.properties.REGIONE || (f.properties.COD_REG === 6 ? "Friuli Venezia Giulia" : "Veneto")
@@ -687,18 +888,28 @@
                     if (nomeTuttoMaiuscolo.includes("S.BIAGIO") || nomeTuttoMaiuscolo.includes("SAN BIAGIO")) return false;
                     return true;
                 });
-
+                
                 stazioniRFI.push({ nome: "TORVISCOSA", lat: 45.82362, lon: 13.27964, regione: "Friuli Venezia Giulia" });
                 stazioniRFI.push({ nome: "RONCHI LEG. SUD", lat: 45.82348, lon: 13.50422, regione: "Friuli Venezia Giulia" });
+                stazioniRFI.push({ nome: "REDIPUGLIA", lat: 45.853593, lon: 13.485993, regione: "Friuli Venezia Giulia" });
 
                 stazioniRFI.forEach(st => {
                     let nomeStazione = st.nome.toUpperCase();
-                    if (nomeStazione.includes("GAZZERA")) { st.lat = 45.490362; st.lon = 12.222710; } 
-                    else if (nomeStazione.includes("OSPEDALE")) { st.lat = 45.51330; st.lon = 12.22556; } 
-                    else if (nomeStazione.includes("TROVASO")) { st.lat = 45.625205; st.lon = 12.232730; } 
-                    else if (nomeStazione.includes("TREVISO CENTRALE")) { st.lat = 45.659591; st.lon = 12.245172; }
-                    else if (nomeStazione.includes("LIBERALE")) { st.nome = "S.LIBERALE"; }
-                    else if (nomeStazione.includes("S.GIOVANNI DI CASARSA") || nomeStazione === "S.GIOVANNI") { st.nome = "S.GIOVANNI DI C."; }
+                    if (nomeStazione.includes("VAT") || nomeStazione.includes("LEVATA")) {
+                        st.nome = "P.M. VAT";
+                        st.lat = 46.092902;
+                        st.lon = 13.247471;
+                    } else if (nomeStazione.includes("PONTEBBA")) {
+                        st.lat = 46.508552;
+                        st.lon = 13.311574;
+                    } else if (nomeStazione.includes("UGOVIZZA")) {
+                        st.lat = 46.502853;
+                        st.lon = 13.494918;
+                    } else if (nomeStazione.includes("LIBERALE")) {
+                        st.nome = "S.LIBERALE";
+                    } else if (nomeStazione.includes("GIOVANNI DI CASARSA")) {
+                        st.nome = "S.GIOVANNI DI C.";
+                    }
                 });
 
                 const featuresByTratta = {};
@@ -716,22 +927,19 @@
                         if (matchingKeys.length === 0) matchingKeys = Object.keys(featuresByTratta).filter(k => k.includes(segTrimmed));
                         matchingKeys.forEach(k => {
                             featuresByTratta[f.nuovoNome].push(...featuresByTratta[k]);
-                            delete featuresByTratta[k]; 
+                            delete featuresByTratta[k];
                         });
                     });
                 });
 
                 const tratteMap = new Map();
-                
                 Object.keys(featuresByTratta).forEach(nomeTratta => {
                     if (!TRATTE_AMMESSE.includes(nomeTratta)) return;
-                    
                     let coloreAssegnato = COLORI_FISSI[nomeTratta];
                     if (!coloreAssegnato) {
                         coloreAssegnato = PALETTE_EXTRA[colorIndex % PALETTE_EXTRA.length];
                         colorIndex++;
                     }
-
                     tratteMap.set(nomeTratta, { nome: nomeTratta, coloreLinea: coloreAssegnato, coloreStazione: "#000", attiva: false, punti: [], stazioniDaInserire: [], regioniTrovate: new Set() });
                     let tObj = tratteMap.get(nomeTratta);
 
@@ -785,9 +993,9 @@
 
                     let curKm = 0, lLat = null, lLon = null;
                     chained.forEach(c => {
-                        if (lLat !== null) {  
-                            let d = getDistance(lLat, lLon, c[1], c[0]);  
-                            if (d < 25) curKm += d;  
+                        if (lLat !== null) {
+                            let d = getDistance(lLat, lLon, c[1], c[0]);
+                            if (d < 25) curKm += d;
                         }
                         tObj.punti.push({ lat: c[1], lon: c[0], km: curKm, isStazione: false });
                         lLat = c[1]; lLon = c[0];
@@ -798,14 +1006,14 @@
                     tratteMap.forEach(t => {
                         if (t.nome === nomeSuper2) {  
                             const escluse = ["CARPENEDO", "OLIMPIA", "FAGAR", "GORGO", "ODERZO", "MOTTA", "GAGGIO"];
-                            if (escluse.some(nomeEscluso => st.nome.toUpperCase().includes(nomeEscluso))) return;  
-                        }
+                            if (escluse.some(nomeEscluso => st.nome.toUpperCase().includes(nomeEscluso))) return;
+                          }
                         if (t.nome === nomeSuper6) {  
                             const escluse = ["GAZZERA"];
-                            if (escluse.some(nomeEscluso => st.nome.toUpperCase().includes(nomeEscluso))) return;  
-                        }                         
+                            if (escluse.some(nomeEscluso => st.nome.toUpperCase().includes(nomeEscluso))) return;
+                          }
                         if (t.nome === nomeSuper4 && st.nome.toUpperCase() === "SACILE") return;
-
+                        
                         let bestPerLinea = null;
                         let bDist = 0.25;
                         let bestInsertIdx = -1;
@@ -819,10 +1027,10 @@
                             }
                         }
                         
-                        if (bestPerLinea) {  
-                            t.stazioniDaInserire.push({stazione: bestPerLinea, idx: bestInsertIdx}); 
-                            if (st.regione) t.regioniTrovate.add(st.regione.toUpperCase());  
-                        }
+                        if (bestPerLinea) {
+                               t.stazioniDaInserire.push({stazione: bestPerLinea, idx: bestInsertIdx}); 
+                            if (st.regione) t.regioniTrovate.add(st.regione.toUpperCase());
+                          }
                     });
                 });
                 
@@ -838,28 +1046,61 @@
                         t.punti[0].km = 0.0;
                     }
                 });
-
+                
                 let trataSPM = tratteMap.get(nomeSuper6);
-                if (trataSPM) applicaCalibrazioneStazioni(trataSPM, kmRealiSanPoloMestre, stazioniRFI);
-
+                if (trataSPM) applicaCalibrazioneStazioniEGps(trataSPM, kmRealiSanPoloMestre, capisaldiGpsSanPoloMestre, stazioniRFI);
+                
+                // MODIFICA CRITICA: Calibriamo le due tratte UD-Cervignano separatamente INCLUDENDO ORA ANCHE I GPS
+                let trattaUDPA = tratteMap.get(nomeSuper8a);
+                if (trattaUDPA) applicaCalibrazioneStazioniEGps(trattaUDPA, kmRealiUdinePalmanova, capisaldiGpsUdinePalmanova);
+                
+                let trattaPACE = tratteMap.get(nomeSuper8b);
+                if (trattaPACE) applicaCalibrazioneStazioniEGps(trattaPACE, kmRealiPalmanovaCervignano, capisaldiGpsPalmanovaCervignano);
+                
                 let trattaUDSP = tratteMap.get(nomeSuper1);
-                if (trattaUDSP) applicaCalibrazioneGps(trattaUDSP, capisaldiGpsUdineBivioSPolo, 53.6);
-
+                if (trattaUDSP) applicaCalibrazioneStazioniEGps(trattaUDSP, kmRealiUdineBivioSPolo, capisaldiGpsUdineBivioSPolo);
+                
                 let trattaUDVE = tratteMap.get(nomeSuper2);
                 if (trattaUDVE) applicaCalibrazioneStazioniEGps(trattaUDVE, kmRealiUdineMestre, capisaldiGpsUdineMestre);
+                
+                let trattaUDTV = tratteMap.get(nomeSuper3);
+                if (trattaUDTV) applicaCalibrazioneStazioniEGps(trattaUDTV, kmRealiUdineTarvisio, capisaldiGpsUdineTarvisio);
 
                 let trattaPGCS = tratteMap.get(nomeSuper5);
                 if (trattaPGCS) applicaCalibrazioneStazioniEGps(trattaPGCS, kmRealiPortoCasarsa, capisaldiGpsCasarsaPortogruaro);
                 
                 let trattaSAMA = tratteMap.get(nomeSuper4);
-                if (trattaSAMA) applicaCalibrazioneStazioni(trattaSAMA, kmRealiSacileManiago);
+                // Go šomiša dintlha tša GPS go kalibareita tsela
+                if (trattaSAMA) applicaCalibrazioneStazioniEGps(trattaSAMA, kmRealiSacileManiago, capisaldiGpsSacileManiago);
                 
                 let trattaMEVE = tratteMap.get(nomeSuper9);
                 if (trattaMEVE) applicaCalibrazioneStazioniEGps(trattaMEVE, kmRealiMestreSantaLucia, capisaldiGpsMestreSantaLucia);
-
+                
                 let trattaTSBP = tratteMap.get(nomeSuper7);
                 if (trattaTSBP) applicaCalibrazioneTrieste(trattaTSBP);
 
+                // NUOVA MODIFICA: Calibrazione fissa per P.M. VAT - UDINE PARCO (Chilometri decrescenti)
+                let trattaVatUdineParco = tratteMap.get("P.M. VAT - UDINE PARCO");
+                if (trattaVatUdineParco && trattaVatUdineParco.punti.length > 0) {
+                    // Controlliamo quale estremo della linea è P.M. VAT usando le coordinate note
+                    let latVat = 46.092902, lonVat = 13.247471;
+                    let dInizio = getDistance(trattaVatUdineParco.punti[0].lat, trattaVatUdineParco.punti[0].lon, latVat, lonVat);
+                    let dFine = getDistance(trattaVatUdineParco.punti[trattaVatUdineParco.punti.length-1].lat, trattaVatUdineParco.punti[trattaVatUdineParco.punti.length-1].lon, latVat, lonVat);
+                    
+                    let ancoreVP = [];
+                    if (dInizio < dFine) {
+                        // L'inizio della geometria è VAT (7.677), la fine è Udine Parco (0.920)
+                        ancoreVP.push({ indice: 0, kmCalcolato: trattaVatUdineParco.punti[0].km, kmReale: 7.677 });
+                        ancoreVP.push({ indice: trattaVatUdineParco.punti.length - 1, kmCalcolato: trattaVatUdineParco.punti[trattaVatUdineParco.punti.length - 1].km, kmReale: 0.920 });
+                    } else {
+                        // L'inizio della geometria è Udine Parco (0.920), la fine è VAT (7.677)
+                        ancoreVP.push({ indice: 0, kmCalcolato: trattaVatUdineParco.punti[0].km, kmReale: 0.920 });
+                        ancoreVP.push({ indice: trattaVatUdineParco.punti.length - 1, kmCalcolato: trattaVatUdineParco.punti[trattaVatUdineParco.punti.length - 1].km, kmReale: 7.677 });
+                    }
+                    // ricalcolaSuAncore forzerà i chilometri a scalare dolcemente tra questi due estremi
+                    ricalcolaSuAncore(trattaVatUdineParco, ancoreVP);
+                }
+                
                 containerTratte.innerHTML = "";
                 let raggruppamento = {};
                 
@@ -867,7 +1108,7 @@
                     let regArray = Array.from(t.regioniTrovate);
                     let cat = regArray.length === 1 ? regArray[0] : "Interregionali/Altro";
                     
-                    if (t.nome === nomeSuper1 || t.nome === nomeSuper2 || t.nome === nomeSuper3 || t.nome === nomeSuper4 || t.nome === nomeSuper5 || t.nome === nomeSuper6 || t.nome === nomeSuper7 || t.nome === nomeSuper8 || t.nome === nomeSuper9 || t.nome.toUpperCase() === "P.M. VAT - UDINE PARCO") {
+                    if (t.nome === nomeSuper1 || t.nome === nomeSuper2 || t.nome === nomeSuper3 || t.nome === nomeSuper4 || t.nome === nomeSuper5 || t.nome === nomeSuper6 || t.nome === nomeSuper7 || t.nome === nomeSuper8a || t.nome === nomeSuper8b || t.nome === nomeSuper9 || t.nome.toUpperCase() === "P.M. VAT - UDINE PARCO") {
                         cat = "Regionale FVG";
                     }
                     
@@ -878,29 +1119,32 @@
                     if (!raggruppamento[cat]) raggruppamento[cat] = [];
                     raggruppamento[cat].push(t);
                 });
-
+                
                 const ordineCat = ["Regionale FVG", "Friuli Venezia Giulia", "Interregionali/Altro"];
                 const chiaviOrdinate = Object.keys(raggruppamento).sort((a,b) => {
                     let idxA = ordineCat.indexOf(a); let idxB = ordineCat.indexOf(b);
                     return (idxA === -1 ? 99 : idxA) - (idxB === -1 ? 99 : idxB);
                 });
-
+                
                 const nomiVisuali = {
                     "UDINE - BIVIO S.POLO": "UDINE - BIVIO SAN POLO",
                     "TRIESTE CENTRALE - BIVIO S.POLO": "TRIESTE CENTRALE - BIVIO SAN POLO", 
                     "BIVIO SAN POLO - MESTRE": "BIVIO SAN POLO - VENEZIA MESTRE"
                 };
-
+                
+                // Troviamo gli indici esatti delle due tratte per poterle accendere insieme
+                let idx8a = tratte.findIndex(tr => tr.nome === nomeSuper8a);
+                let idx8b = tratte.findIndex(tr => tr.nome === nomeSuper8b);
+                
                 chiaviOrdinate.forEach(cat => {
-                    // Usiamo un semplice <div> invece di <details> per togliere la tendina
                     const det = document.createElement('div'); det.style.marginBottom = "10px";
                     
                     if (cat === "Regionale FVG") {
                         const ordinePersonalizzato = [
-                            nomeSuper2, nomeSuper1, nomeSuper3, nomeSuper8, nomeSuper7, 
+                            nomeSuper2, nomeSuper1, nomeSuper3, nomeSuper8a, nomeSuper8b, nomeSuper7, 
                             nomeSuper6, nomeSuper9, nomeSuper5, nomeSuper4, "P.M. VAT - UDINE PARCO"
                         ].map(n => n.toUpperCase());
-
+                        
                         raggruppamento[cat].sort((a, b) => {
                             let posA = ordinePersonalizzato.indexOf(a.nome.toUpperCase());
                             let posB = ordinePersonalizzato.indexOf(b.nome.toUpperCase());
@@ -909,27 +1153,36 @@
                         
                         let indicePrec = -1;
                         raggruppamento[cat].forEach(t => {
+                            // MODIFICA CRITICA: Nascondiamo totalmente la tratta 2 dalla grafica
+                            if (t.nome === nomeSuper8b) return;
+                            
                             let posAttuale = ordinePersonalizzato.indexOf(t.nome.toUpperCase());
                             
-                            // Inseriamo lo spaziatore per creare i gruppi logici (doppio spazio)
-                            if (indicePrec !== -1 && ((indicePrec === 3 && posAttuale === 4) || (indicePrec === 6 && posAttuale === 7) || (indicePrec === 8 && posAttuale === 9))) {
+                            // Adattiamo gli spaziatori al salto della tratta nascosta
+                            if (indicePrec !== -1 && ((indicePrec === 3 && posAttuale === 5) || (indicePrec === 7 && posAttuale === 8) || (indicePrec === 9 && posAttuale === 10))) {
                                 const spaziatore = document.createElement('div'); 
-                                spaziatore.style.height = "24px"; /* Aumentato a 24px per un distacco netto */
+                                spaziatore.style.height = "24px"; 
                                 det.appendChild(spaziatore);
                             }
                             indicePrec = posAttuale;
-
+                            
                             const lbl = document.createElement('label'); lbl.className = 'checkbox-container'; lbl.style.marginLeft = "15px";
                             let style = 'font-weight:bold; color:#d9534f;';
-                            let nomeDaMostrare = nomiVisuali[t.nome.toUpperCase()] || t.nome;
                             
-                            lbl.innerHTML = `<input type="checkbox" id="chk-tratta-${t.idx}" onchange="toggleTratta(${t.idx}, this.checked)"><span style="color:${t.coloreLinea}; font-size:18px;">■</span> <span style="${style}">${nomeDaMostrare}</span>`;
+                            // SE SIAMO SULLA TRATTA 1, CREIAMO IL BOTTONE UNIFICATO CHE ACCENDE ENTRAMBE
+                            if (t.nome === nomeSuper8a) {
+                                lbl.innerHTML = `<input type="checkbox" id="chk-tratta-${t.idx}" onchange="toggleTratta(${idx8a}, this.checked); toggleTratta(${idx8b}, this.checked)"><span style="color:${t.coloreLinea}; font-size:18px;">■</span> <span style="${style}">UDINE - CERVIGNANO A.G.</span>`;
+                            } else {
+                                let nomeDaMostrare = nomiVisuali[t.nome.toUpperCase()] || t.nome;
+                                lbl.innerHTML = `<input type="checkbox" id="chk-tratta-${t.idx}" onchange="toggleTratta(${t.idx}, this.checked)"><span style="color:${t.coloreLinea}; font-size:18px;">■</span> <span style="${style}">${nomeDaMostrare}</span>`;
+                            }
+                            
                             det.appendChild(lbl);
                         });
-
-                    } else {  
-                        raggruppamento[cat].sort((a,b) => a.nome.localeCompare(b.nome));  
-                        raggruppamento[cat].forEach(t => {
+                    
+                    } else {
+                          raggruppamento[cat].sort((a,b) => a.nome.localeCompare(b.nome));
+                          raggruppamento[cat].forEach(t => {
                             const lbl = document.createElement('label'); lbl.className = 'checkbox-container'; lbl.style.marginLeft = "15px";
                             let nomeDaMostrare = nomiVisuali[t.nome.toUpperCase()] || t.nome;
                             
@@ -943,57 +1196,53 @@
                 
                 statusText.innerText = "Sistema pronto! Dati in memoria.";
                 aggiornaVisualizzazione();
-
+                
                 if (ultimaPosizioneGps) {
                     updateLocation(ultimaPosizioneGps);
                 }
-
             } catch (e) {  
-                statusText.innerText = "Errore connessione RFI. Verifica la rete.";  
-                console.error(e);  
-            }
+                  statusText.innerText = "Errore connessione RFI. Verifica la rete.";  
+                  console.error(e);  
+              }
         }
-
-        /* =========================================================================
-           6. SETUP INIZIALE MAPPA (LEAFLET)
-           ========================================================================= */
-        map = L.map('map').setView([46.1, 13.1], 9);
+        
+        map = L.map('map', {
+            fullscreenControl: true,
+            fullscreenControlOptions: {
+                position: 'topright' // Posiziona il pulsante esattamente in alto a destra
+            }
+        }).setView([46.1, 13.1], 9);
         mainLayerGroup.addTo(map);
         osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OSM' }).addTo(map);
         map.on('zoomend', aggiornaVisualizzazione);
-
+        
         function toggleBackground(c) { osmLayer.setOpacity(c.checked ? 0 : 1); }
         
-        // NUOVA FUNZIONE: Mostra/Nascondi le coordinate
         window.toggleCordinate = () => {
             const isChecked = document.getElementById('toggle-coords').checked;
-            // Se l'interruttore è acceso, usa "block" per mostrarlo, altrimenti "none" per nasconderlo
             displayCoords.style.display = isChecked ? 'block' : 'none';
         };
         
         window.toggleTratta = (i, c) => {  
-            tratte[i].attiva = c;  
-            aggiornaVisualizzazione();  
-            if (ultimaPosizioneGps) updateLocation(ultimaPosizioneGps);  
-        };
-
-        /* =========================================================================
-           7. RENDER GRAFICO (LINEE, CIPPI, STAZIONI)
-           ========================================================================= */
+              tratte[i].attiva = c;  
+              aggiornaVisualizzazione();  
+              if (ultimaPosizioneGps) updateLocation(ultimaPosizioneGps);  
+          };
+        
         function aggiornaVisualizzazione() {
             mainLayerGroup.clearLayers();
             const cippi = document.getElementById('toggle-cippi').checked;
             const staz = document.getElementById('toggle-stazioni').checked;
             const zoomAttuale = map.getZoom();
-
+            
             tratte.forEach(t => {
                 if (!t.attiva) return;
                 let pts = [];
                 for(let i=0; i<t.punti.length; i++) {
                     if (i > 0 && Math.abs(t.punti[i].km - t.punti[i-1].km) > 20) {  
-                        L.polyline(pts, {color: t.coloreLinea, weight: 4}).addTo(mainLayerGroup);  
-                        pts = [];  
-                    }
+                          L.polyline(pts, {color: t.coloreLinea, weight: 4}).addTo(mainLayerGroup);  
+                          pts = [];  
+                      }
                     pts.push([t.punti[i].lat, t.punti[i].lon]);
                 }
                 L.polyline(pts, {color: t.coloreLinea, weight: 4}).addTo(mainLayerGroup);
@@ -1017,43 +1266,40 @@
                         }
                     }
                 });
+                
                 if (staz) t.punti.forEach(s => {  
-                    if(s.isStazione) L.circleMarker([s.lat, s.lon], { radius: 8, fillColor: "#000", color: "#fff", weight: 2, fillOpacity: 1 }).addTo(mainLayerGroup).bindPopup(`<b>${s.nome}</b><br>Km ${s.km.toFixed(1)}`);  
-                });
+                      if(s.isStazione) L.circleMarker([s.lat, s.lon], { radius: 8, fillColor: "#000", color: "#fff", weight: 2, fillOpacity: 1 }).addTo(mainLayerGroup).bindPopup(`<b>${s.nome}</b><br>Km ${s.km.toFixed(1)}`);  
+                  });
             });
         }
-
-        /* =========================================================================
-           8. CORE GESTIONE GEOLOCALIZZAZIONE LIVE
-           ========================================================================= */
+        
         function updateLocation(pos) {
             ultimaPosizioneGps = pos; 
             const { latitude, longitude, accuracy } = pos.coords;
-
+            
             if (accuracy) {
                 let color = accuracy <= 20 ? '#28a745' : (accuracy <= 60 ? '#ffc107' : '#dc3545');
                 displayAccuracy.innerHTML = `<span style="color: ${color}; font-weight: bold;">±${accuracy.toFixed(0)} m</span>`;
             }
-
-            // SCRIVIAMO LE COORDINATE REALI NEL BOX (usiamo toFixed(5) per avere 5 decimali, che è molto preciso)
+            
             if (displayCoords) {
                 displayCoords.innerHTML = `Lat: <b style="color: var(--text-color);">${latitude.toFixed(5)}</b> <br> Lon: <b style="color: var(--text-color);">${longitude.toFixed(5)}</b>`;
             }
-
-            if (!userMarker) {   
-                userMarker = L.circleMarker([latitude, longitude], { color: '#fff', fillColor: '#00F', radius: 11, fillOpacity: 1, weight: 4 }).addTo(map);   
-                map.setView([latitude, longitude], 13);  
+            
+            if (!userMarker) { 
+                 userMarker = L.circleMarker([latitude, longitude], { color: '#fff', fillColor: '#00F', radius: 11, fillOpacity: 1, weight: 4 }).addTo(map); 
+                 map.setView([latitude, longitude], 13);
             } else {
                 userMarker.setLatLng([latitude, longitude]);
                 if (document.getElementById('toggle-autocenter').checked) {
-                    map.setView([latitude, longitude]);  
+                    map.setView([latitude, longitude]);
                 }
             }
-
+            
             if (!autoSelezioneFatta && tratte.length > 0) {
                 let idTrattaPiuVicina = -1;
                 let distMinimaAssoluta = Infinity;
-
+                
                 tratte.forEach((t) => {
                     for (let i = 0; i < t.punti.length - 1; i++) {
                         let m = getDistanceToSegment(latitude, longitude, t.punti[i].lat, t.punti[i].lon, t.punti[i+1].lat, t.punti[i+1].lon);
@@ -1063,11 +1309,29 @@
                         }
                     }
                 });
-
+                
                 if (idTrattaPiuVicina !== -1 && distMinimaAssoluta < 5) {
                     tratte[idTrattaPiuVicina].attiva = true;
-                    const chk = document.getElementById(`chk-tratta-${idTrattaPiuVicina}`);
-                    if (chk) chk.checked = true;
+                    
+                    // GESTIONE SPECIALE GPS PER LA LINEA UNIFICATA UDINE-CERVIGNANO
+                    if (tratte[idTrattaPiuVicina].nome === nomeSuper8a) {
+                        let t8b = tratte.find(t => t.nome === nomeSuper8b);
+                        if (t8b) t8b.attiva = true;
+                        const chk = document.getElementById(`chk-tratta-${idTrattaPiuVicina}`);
+                        if (chk) chk.checked = true;
+                    } else if (tratte[idTrattaPiuVicina].nome === nomeSuper8b) {
+                        let t8a = tratte.find(t => t.nome === nomeSuper8a);
+                        if (t8a) {
+                            t8a.attiva = true;
+                            const chk = document.getElementById(`chk-tratta-${t8a.idx}`);
+                            if (chk) chk.checked = true;
+                        }
+                    } else {
+                        // Comportamento normale
+                        const chk = document.getElementById(`chk-tratta-${idTrattaPiuVicina}`);
+                        if (chk) chk.checked = true;
+                    }
+                    
                     aggiornaVisualizzazione();
                     statusText.innerText = `GPS Acceso. Linea auto-selezionata.`;
                 }
@@ -1079,42 +1343,195 @@
                 if (!t.attiva) return;
                 
                 t.punti.forEach(s => {  
-                    if (s.isStazione) {  
-                        let d = getDistance(latitude, longitude, s.lat, s.lon);  
-                        if (d < dMin) { dMin = d; nStaz = s; }  
-                    }  
-                });
+                      if (s.isStazione) {  
+                          let d = getDistance(latitude, longitude, s.lat, s.lon);  
+                          if (d < dMin) { dMin = d; nStaz = s; }  
+                      }  
+                  });
+                
                 for (let i = 0; i < t.punti.length - 1; i++) {
                     let m = getDistanceToSegment(latitude, longitude, t.punti[i].lat, t.punti[i].lon, t.punti[i+1].lat, t.punti[i+1].lon);
-                    if (!best || m.dist < best.dist) best = { dist: m.dist, km: (t.punti[i].km + m.t * (t.punti[i+1].km - t.punti[i].km)).toFixed(2), nome: t.nome };
+                    // Nascondiamo i testi "(Tratta 1)" e "(Tratta 2)" dal display testuale in alto
+                    let nomePulito = t.nome.replace(" (Tratta 1)", "").replace(" (Tratta 2)", "");
+                    if (!best || m.dist < best.dist) best = { dist: m.dist, km: (t.punti[i].km + m.t * (t.punti[i+1].km - t.punti[i].km)).toFixed(2), nome: nomePulito };
                 }
             });
             
-            if (best && nStaz) {   
-                if (best.dist > 0.5) {
+            if (best && nStaz) { 
+                 if (best.dist > 0.5) {
                     displayStazione.innerHTML = `⚠️ Sede ferroviaria non rilevata`;
                     displayKm.innerHTML = `---`;
                     displayTratta.innerText = `Fuori linea o segnale GPS debole`;
                 } else {
                     displayStazione.innerHTML = `Stazione più vicina: <b>${nStaz.nome}</b> (${dMin.toFixed(1)} km)`;  
-                    displayKm.innerHTML = `Km ${best.km}`;  
-                    displayTratta.innerText = `Linea: ${best.nome}`;  
-                }
+                      displayKm.innerHTML = `Km ${best.km}`;  
+                      displayTratta.innerText = `Linea: ${best.nome}`;  
+                  }
             }
         }
-
+        
         function forzaPosizione() {  
-            if (ultimaPosizioneGps) {
+              if (ultimaPosizioneGps) {
                 map.setView([ultimaPosizioneGps.coords.latitude, ultimaPosizioneGps.coords.longitude]);
             }
             navigator.geolocation.getCurrentPosition(updateLocation, null, { enableHighAccuracy: true });  
-        }
+          }
 
         /* =========================================================================
-           9. ESECUZIONE ALL'AVVIO
+           9. GESTIONE WAKE LOCK (SCHERMO SEMPRE ACCESO)
+           ========================================================================= */
+        let wakeLock = null;
+
+        async function richiediWakeLock() {
+            try {
+                if ('wakeLock' in navigator) {
+                    wakeLock = await navigator.wakeLock.request('screen');
+                    wakeLock.addEventListener('release', () => {
+                        console.log('Wake Lock rilasciato dal sistema.');
+                    });
+                    console.log('Wake Lock attivato: lo schermo non si spegnerà.');
+                }
+            } catch (err) {
+                console.warn(`Impossibile mantenere lo schermo acceso: ${err.message}`);
+            }
+        }
+
+        document.addEventListener('visibilitychange', async () => {
+            if (wakeLock !== null && document.visibilityState === 'visible') {
+                await richiediWakeLock();
+            }
+        });
+
+        /* =========================================================================
+           10. ESECUZIONE ALL'AVVIO
            ========================================================================= */
         scaricaDatiRFI();
+        
         navigator.geolocation.watchPosition(updateLocation, null, { enableHighAccuracy: true });
+        
+        richiediWakeLock();
+
+        /* =========================================================================
+           11. GESTIONE AREA ADMIN (CODICE 1717) E STAMPA CAPISALDI / GPS
+           ========================================================================= */
+        function richiediCodiceAdmin() {
+            let pin = prompt("🔒 Inserisci il codice di accesso (Capisaldi RFI):");
+            if (pin === "1717") {
+                generaTabelleCapisaldi();
+                generaTabelleGPS();
+                document.getElementById('admin-modal').style.display = 'flex';
+                // Resetta sempre alla prima scheda quando si apre
+                switchTabAdmin('km');
+            } else if (pin !== null) {
+                alert("❌ Codice errato.");
+            }
+        }
+
+        function chiudiAdmin() {
+            document.getElementById('admin-modal').style.display = 'none';
+        }
+
+        function switchTabAdmin(tabId) {
+            const tabKm = document.getElementById('tab-km');
+            const tabGps = document.getElementById('tab-gps');
+            const btnKm = document.getElementById('btn-tab-km');
+            const btnGps = document.getElementById('btn-tab-gps');
+
+            if (tabId === 'km') {
+                tabKm.style.display = 'block';
+                tabGps.style.display = 'none';
+                btnKm.classList.add('active');
+                btnGps.classList.remove('active');
+            } else {
+                tabKm.style.display = 'none';
+                tabGps.style.display = 'block';
+                btnKm.classList.remove('active');
+                btnGps.classList.add('active');
+            }
+        }
+
+        function generaTabelleCapisaldi() {
+            const container = document.getElementById('tab-km');
+            container.innerHTML = ""; 
+            
+            const lineeDati = [
+                { nome: nomeSuper1, dati: kmRealiUdineBivioSPolo },
+                { nome: nomeSuper2, dati: kmRealiUdineMestre },
+                { nome: nomeSuper3, dati: kmRealiUdineTarvisio },
+                { nome: nomeSuper4, dati: kmRealiSacileManiago },
+                { nome: nomeSuper5, dati: kmRealiPortoCasarsa },
+                { nome: nomeSuper6, dati: kmRealiSanPoloMestre },
+                { nome: nomeSuper7, dati: { "TRIESTE CENTRALE": 0.0, "MIRAMARE": 7.033, "BIVIO D'AURISINA": 130.463, "SISTIANA": 127.730, "MONFALCONE": 117.746 } }, 
+                { nome: nomeSuper8a, dati: kmRealiUdinePalmanova },
+                { nome: nomeSuper8b, dati: kmRealiPalmanovaCervignano },
+                { nome: nomeSuper9, dati: kmRealiMestreSantaLucia }
+            ];
+
+            lineeDati.forEach(linea => {
+                let html = `<h3 style="color: var(--text-color); margin-bottom: 8px; margin-top: 20px; font-size: 16px;">📍 ${linea.nome}</h3>`;
+                html += `<table class="capisaldi-table">
+                            <tr>
+                                <th style="text-align: left;">Stazione / Punto Notevole</th>
+                                <th style="text-align: right;">Progressiva (Km)</th>
+                            </tr>`;
+                
+                let entries = Object.entries(linea.dati).sort((a, b) => a[1] - b[1]);
+                
+                entries.forEach(([stazione, km]) => {
+                    html += `<tr>
+                                <td><b>${stazione}</b></td>
+                                <td style="text-align: right; color: var(--note-color);">${km.toFixed(3).replace('.', ',')}</td> 
+                            </tr>`;
+                });
+                
+                html += `</table>`;
+                container.innerHTML += html;
+            });
+        }
+
+        function generaTabelleGPS() {
+            const container = document.getElementById('tab-gps');
+            container.innerHTML = ""; 
+            
+            // Inseriamo qui solo le linee per cui hai definito array di capisaldi GPS nel codice
+            const lineeGps = [
+                { nome: nomeSuper1, dati: capisaldiGpsUdineBivioSPolo },
+                { nome: nomeSuper2, dati: capisaldiGpsUdineMestre },
+                { nome: nomeSuper3, dati: capisaldiGpsUdineTarvisio },
+                { nome: nomeSuper4, dati: capisaldiGpsSacileManiago }, // E tsentšwe tsela ya SACILE - MANIAGO
+                { nome: nomeSuper5, dati: capisaldiGpsCasarsaPortogruaro },
+                { nome: nomeSuper6, dati: capisaldiGpsSanPoloMestre },
+                { nome: nomeSuper8a, dati: capisaldiGpsUdinePalmanova },
+                { nome: nomeSuper8b, dati: capisaldiGpsPalmanovaCervignano },
+                { nome: nomeSuper9, dati: capisaldiGpsMestreSantaLucia }
+            ];
+
+            lineeGps.forEach(linea => {
+                let html = `<h3 style="color: var(--text-color); margin-bottom: 8px; margin-top: 20px; font-size: 16px;">📡 ${linea.nome}</h3>`;
+                html += `<table class="capisaldi-table">
+                            <tr>
+                                <th style="text-align: left;">Punto (Km)</th>
+                                <th style="text-align: right;">Latitudine</th>
+                                <th style="text-align: right;">Longitudine</th>
+                            </tr>`;
+                
+                // Ordiniamo per chilometraggio crescente
+                linea.dati.sort((a, b) => a.km - b.km).forEach(punto => {
+                    html += `<tr>
+                                <td><b>Km ${punto.km.toFixed(3).replace('.', ',')}</b></td>
+                                <td style="text-align: right; color: var(--note-color); font-family: monospace;">${punto.lat.toFixed(6)}</td>
+                                <td style="text-align: right; color: var(--note-color); font-family: monospace;">${punto.lon.toFixed(6)}</td> 
+                            </tr>`;
+                });
+                
+                html += `</table>`;
+                container.innerHTML += html;
+            });
+            
+            if (lineeGps.length === 0) {
+                container.innerHTML = `<p style="color: var(--note-color); text-align: center; margin-top: 20px;">Nessun dato GPS salvato nel codice.</p>`;
+            }
+        }
     </script>
 </body>
 </html>
